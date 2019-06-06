@@ -4,6 +4,8 @@ services:
     image: "mongo:3-stretch"
     volumes:
       - ~/db/room-monitor:/data/db
+    ports:
+      - "4002:27017"
   mongo-express:
     image: "mongo-express:latest"
     environment:
@@ -14,7 +16,7 @@ services:
       - "4001:8081"
   app:
     build:
-      context: .「
+      context: .
       dockerfile: Dockerfile-proc
     environment:
       NODE_ENV: production

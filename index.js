@@ -13,7 +13,8 @@ const Monitor = mongoose.model('Monitor', {
   co2ppm: Number
 })
 app.get('/', async function (req, res) {
-  
+  const last = await Monitor.find().sort('-date').limit(10).exec()
+  return res.json(last)
 })
 
 app.get('/zawarudo', async function (req, res) {

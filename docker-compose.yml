@@ -8,6 +8,7 @@ services:
     image: "mongo-express:latest"
     environment:
       ME_CONFIG_MONGODB_SERVER: db
+      WAIT_HOSTS: db:27017
     depends_on:
       - db
     ports:
@@ -15,6 +16,7 @@ services:
   app:
     build: .
     environment:
+      WAIT_HOSTS: db:27017
       TOKEN: ${TOKEN}
     ports:
       - 4000:3000
