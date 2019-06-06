@@ -1,0 +1,26 @@
+version: "3"
+services:
+  db:
+    image: "mongo:3-stretch"
+    volumes:
+      - ~/db/room-monitor:/data/db
+  mongo-express:
+    image: "mongo-express:latest"
+    environment:
+      ME_CONFIG_MONGODB_SERVER: db
+    depends_on:
+      - db
+    ports:
+      - "4001:8081"
+  app:
+    image: co2
+    build: .
+    environment:
+      NODE_ENV: production
+      TOKEN: ${TOKEN}
+    ports:
+      - 4000:3000
+    volumes:
+      - ./:/usr/src/app
+    depends_on:
+      - db

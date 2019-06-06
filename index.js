@@ -12,8 +12,11 @@ const Monitor = mongoose.model('Monitor', {
   temperature: Number,
   co2ppm: Number
 })
-
 app.get('/', async function (req, res) {
+  
+})
+
+app.get('/zawarudo', async function (req, res) {
 
   if ( req.query.token == TOKEN) {
     new Monitor({
