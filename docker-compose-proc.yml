@@ -13,14 +13,13 @@ services:
     ports:
       - "4001:8081"
   app:
-    image: co2
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile-proc
     environment:
       NODE_ENV: production
       TOKEN: ${TOKEN}
     ports:
       - 4000:3000
-    volumes:
-      - ./:/usr/src/app
     depends_on:
       - db
