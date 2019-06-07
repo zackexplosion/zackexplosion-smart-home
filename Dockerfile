@@ -10,6 +10,4 @@ RUN yarn install && yarn cache clean
 # Bundle app source
 COPY . /usr/src/app
 
-# Declaring PROT in containers
-EXPOSE 8080
-CMD [ "yarn", "dev" ]
+RUN ["chmod", "+x", "/usr/src/app/wait-for-it.sh"]

@@ -2,10 +2,12 @@ const { TOKEN } = process.env
 const express = require('express')
 const app = express();
 const morgan = require('morgan')
+const DB_HOST = process.env.DB_HOST || 'db'
+const DB_PORT = process.env.DB_PORT || 27017
 app.use(morgan('combined'))
 
 const mongoose = require('mongoose')
-mongoose.connect('mongodb://db:27017/room-monitor', {useNewUrlParser: true})
+mongoose.connect(`mongodb://${DB_HOST}:${DB_PORT}/room-monitor`, {useNewUrlParser: true})
 
 const Monitor = mongoose.model('Monitor', {
   timestamp: Date,
