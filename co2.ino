@@ -17,8 +17,9 @@
 
 #define WIFI_AP ""
 #define WIFI_PASSWORD ""
-#define SITE_URL "記錄端的IP"
-#define TOKEN "避免被路人亂塞資料"
+#define SITE_URL ""
+#define DELAY_INTERVAL 1000
+#define TOKEN ""
 #define WIFI_AUTH LWIFI_WPA  // choose from LWIFI_OPEN, LWIFI_WPA, or LWIFI_WEP.
 #define sensor Serial1
 LWiFiClient c;
@@ -161,5 +162,5 @@ void loop()
         Serial.println("");
         request();
     }
-    delay(5000);
+    delay(DELAY_INTERVAL);
 }
