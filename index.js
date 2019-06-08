@@ -29,24 +29,29 @@ const Monitor = mongoose.model('Monitor', {
 
 let IOmonitor = io.of('/monitor')
 
-async function getLast(){
-  let last = await Monitor.find().sort('-timestamp').limit(10).exec()
+async function getLast(limit = 10){
+  let last = await Monitor.find().sort('-timestamp').limit(limit).exec()
   return last.map(r => {
     return {
       timestamp: r.timestamp,
       temperature: r.temperature,
       co2ppm: r.co2ppm
     }
-  })
+  }).reverse()
 }
+
+IOmonitor.on('connection', async socket => {
+  socket.emit('lastRecords', await getLast(600))
+})
 
 app.get('/', async function (req, res) {
   res.render('index')
 })
 
-app.get('/last', async function (req, res) {
-  return res.json(await getLast())
-})
+// app.get('/last', async function (req, res) {
+//   const limit = req.query.limit || 600
+//   return res.json(await getLast(limit))
+// })
 
 // recorder
 app.get('/zawarudo', async function (req, res) {
@@ -65,7 +70,7 @@ app.get('/zawarudo', async function (req, res) {
 if (process.env.NODE_ENV !== 'production') {
   let lastDate
   setInterval(async () => {
-    let last = await getLast()
+    let last = await getLast(1)
 
     if (lastDate !== last[0].timestamp) {
       IOmonitor.emit('newRecord', last[0])

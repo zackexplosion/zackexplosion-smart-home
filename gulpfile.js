@@ -1,3 +1,4 @@
+const NODE_ENV = process.env.NODE_ENV || 'development'
 const { watch, src, dest, series, parallel } = require('gulp')
 const sass = require('gulp-sass')
 const minifyCSS = require('gulp-csso')
@@ -8,7 +9,7 @@ const webpackStream = require('webpack-stream')
 const browserSync = require('browser-sync').create()
 const path = require('path')
 const webpack_param = {
-  mode: process.env.NODE_ENV,
+  mode: NODE_ENV,
   entry: {
     app: `./js/app.js`,
   },
