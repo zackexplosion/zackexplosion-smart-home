@@ -1,5 +1,7 @@
 const chartID = 'chart'
 const socket = io('/monitor')
+var ctx = document.getElementById('chart')
+var chart
 var chartInit = false
 var render_data = {}
 
@@ -12,25 +14,48 @@ function renderLael(date) {
 }
 
 socket.on('lastRecords', data => {
-  render_data = {
-    // y: [
-    //   data.map(d => { return d.co2ppm}),
-    //   data.map(d => { return d.temperature})
-    // ],
-    y: data.map(d => { return d.co2ppm}),
-    x: data.map(d => {
-      return renderLael(d.timestamp)
-    }),
+  var lineChartData = {
+    labels: data.map(d => { return renderLael(d.timestamp)}),
+    datasets: [{
+      label: 'CO2 PPM',
+      data: data.map(d => { return d.co2ppm}),
+      yAxisID: 'y-axis-1',
+    }, {
+      label: 'temperature',
+      data: data.map(d => { return d.temperature}),
+      yAxisID: 'y-axis-2',
+    }]
   }
-  let c = Object.assign({}, render_data, {
-    type: 'scatter'
-  })
-  Plotly.plot(chartID, [c],
-  {
-    title: renderTitle(data[0])
-  },
-  {
-    responsive: true
+  chart = new Chart(ctx, {
+    type: 'line',
+    data: lineChartData,
+    options: {
+      responsive: true,
+      // hoverMode: 'index',
+      // stacked: false,
+      title: {
+        display: true,
+        text: 'Chart.js Line Chart - Multi Axis'
+      },
+      scales: {
+        yAxes: [{
+          type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+          display: true,
+          position: 'left',
+          id: 'y-axis-1',
+        }, {
+          type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+          display: true,
+          position: 'right',
+          id: 'y-axis-2',
+
+          // grid line settings
+          // gridLines: {
+          //   drawOnChartArea: false, // only want the grid lines for one axis to show up
+          // },
+        }],
+      }
+    }
   })
   chartInit = true
 })
@@ -45,24 +70,19 @@ socket.on('newRecord', data => {
   let label = renderLael(data.timestamp)
 
   // remove last data
-  render_data.y.shift()
-  render_data.x.shift()
-
-  // render_data.y.push([
-  //   data.co2ppm,
-  //   data.temperature
-  // ])
-  render_data.y.push(data.co2ppm)
-  render_data.x.push(label)
+  // render_data.y.shift()
+  // render_data.x.shift()
+  // render_data.y.push(data.co2ppm)
+  // render_data.x.push(label)
 
   // debugger
 
-  Plotly.update(chartID, {
-    y: [render_data.y],
-    x: [render_data.x]
-  }, {
-    title: renderTitle(data)
-  })
+  // Plotly.update(chartID, {
+  //   y: [render_data.y],
+  //   x: [render_data.x]
+  // }, {
+  //   title: renderTitle(data)
+  // })
 
   // Plotly.animate(chartID, {
   //   data: [{y: [render_data.y]}],

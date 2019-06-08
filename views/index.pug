@@ -9,12 +9,12 @@ html
   body
     //- #app
     //-   ve-line(:data='chartData')
-    //- canvas#chart(style="height: 100vh")
-    #chart
+    canvas#chart(style="height: 100vh")
+    //- #chart
     script(src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js')
     //- script(src='https://code.jquery.com/jquery-3.3.1.min.js', integrity='sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=', crossorigin='anonymous')
     script(src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js')
     script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js')
-    script(src="https://cdn.plot.ly/plotly-latest.min.js")
+    //- script(src="https://cdn.plot.ly/plotly-latest.min.js")
 
     script(src=hashPath("/app.js"))
