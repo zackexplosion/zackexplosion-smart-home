@@ -1,15 +1,28 @@
+import { catchClause } from "../../../Library/Caches/typescript/3.5/node_modules/@types/babel-types";
+
 const chartID = 'chart'
 const socket = io('/monitor')
+const labelFormater = 'HH:mm:ss'
 var chartInit = false
 var render_data = {}
 
 function renderTitle(data) {
-  return `ROOM MONITOR <br /> CO2: ${data.co2ppm} PPM, TEMP: ${data.temperature} c, ${moment(data.timestamp).format('LTS')}`
+  return `ROOM MONITOR <br /> CO2: ${data.co2ppm} PPM, TEMP: ${data.temperature}℃, ${moment(data.timestamp).format('LTS')}`
 }
 
 function renderLael(date) {
-  return moment(date).format('mm:ss')
+  return moment(date).format(labelFormater)
 }
+
+var tickvals = [
+  moment().add(5, 'minutes').format(labelFormater)
+]
+var period = 5
+for (let index = 1; index <= 60/period; index++) {
+  let m = moment().subtract(index * period, 'minutes').format(labelFormater)
+  tickvals.push(m)
+}
+tickvals = tickvals.reverse()
 
 socket.on('lastRecords', data => {
   render_data = {
@@ -21,13 +34,16 @@ socket.on('lastRecords', data => {
     x: data.map(d => {
       return renderLael(d.timestamp)
     }),
+    // x: [0, 1, 2, 3]
   }
   let c = Object.assign({}, render_data, {
     type: 'scatter'
   })
+
   Plotly.plot(chartID, [c],
   {
-    title: renderTitle(data[0])
+    title: renderTitle(data[0]),
+    xaxis: { tickvals }
   },
   {
     responsive: true
@@ -55,13 +71,30 @@ socket.on('newRecord', data => {
   render_data.y.push(data.co2ppm)
   render_data.x.push(label)
 
-  // debugger
+  // var tickvals = [
+  //   moment().add(2, 'minutes').format(labelFormater)
+  // ]
+  // var period = 5
+  // for (let index = 1; index <= 60/period; index++) {
+  //   // let m = moment(new Date()).subtract(index * period, 'minutes')
+  //   let m = moment().subtract(index * period, 'minutes').format(labelFormater)
+  //   tickvals.push(m)
+  // }
+  // // debugger
+
+  // tickvals.reverse()
+  tickvals.shift()
+  tickvals.push(renderLael(label))
+
+  console.log('render_data.x', render_data.x)
+  console.log('tickvals', tickvals)
 
   Plotly.update(chartID, {
     y: [render_data.y],
     x: [render_data.x]
   }, {
-    title: renderTitle(data)
+    title: renderTitle(data),
+    xaxis: { tickvals }
   })
 
   // Plotly.animate(chartID, {

@@ -1,4 +1,5 @@
 const NODE_ENV = process.env.NODE_ENV || 'development'
+const STARTED_LOG_STRING = 'started'
 const { watch, src, dest, series, parallel } = require('gulp')
 const sass = require('gulp-sass')
 const minifyCSS = require('gulp-csso')
@@ -85,7 +86,7 @@ function startNodemon (cb) {
     console.log(stdout.toString())
 
     // check if app ready
-    const isReady = stdout.toString().includes('listening')
+    const isReady = stdout.toString().includes(STARTED_LOG_STRING)
 
     if (!isReady) { return }
     cb()

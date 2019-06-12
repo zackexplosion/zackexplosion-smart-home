@@ -4,15 +4,15 @@ services:
     image: "mongo:3-stretch"
     volumes:
       - ~/db/room-monitor:/data/db
-  mongo-express:
-    image: "mongo-express:latest"
-    environment:
-      ME_CONFIG_MONGODB_SERVER: db
-      WAIT_HOSTS: db:27017
-    depends_on:
-      - db
-    ports:
-      - "4001:8081"
+  # mongo-express:
+  #   image: "mongo-express:latest"
+  #   environment:
+  #     ME_CONFIG_MONGODB_SERVER: db
+  #     WAIT_HOSTS: db:27017
+  #   depends_on:
+  #     - db
+  #   ports:
+  #     - "4001:8081"
   app:
     build: .
     environment:
@@ -24,4 +24,4 @@ services:
       - ./:/usr/src/app
     depends_on:
       - db
-    command: ["./wait-for-it.sh", "db:27017", "--", "yarn", "dev"]
+    command: ["yarn", "gulp"]

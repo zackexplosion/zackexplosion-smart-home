@@ -1,17 +1,14 @@
 const { TOKEN } = process.env
 const express = require('express')
 const app = express()
-const morgan = require('morgan')
+const moment = require('moment')
 const path = require('path')
 
 const DB_HOST = process.env.DB_HOST || 'db'
 const DB_PORT = process.env.DB_PORT || 27017
-app.use(morgan('combined'))
 app.use(express.static(path.join(__dirname, 'dist')))
 
 const mongoose = require('mongoose')
-mongoose.connect(`mongodb://${DB_HOST}:${DB_PORT}/room-monitor`, {useNewUrlParser: true})
-
 const http = require('http').Server(app)
 const io = require('socket.io')(http)
 
@@ -24,24 +21,28 @@ app.set('views', path.join(__dirname, 'views'))
 const Monitor = mongoose.model('Monitor', {
   timestamp: Date,
   temperature: Number,
-  co2ppm: Number
+  co2ppm: Number,
+  battery: Number
 })
 
 let IOmonitor = io.of('/monitor')
 
 async function getLast(limit = 10){
-  let last = await Monitor.find().sort('-timestamp').limit(limit).exec()
+  let last = await Monitor.find({
+    timestamp: {$gte: moment().subtract(1, 'hours')}
+  }).sort('-timestamp').exec()
   return last.map(r => {
     return {
       timestamp: r.timestamp,
       temperature: r.temperature,
-      co2ppm: r.co2ppm
+      co2ppm: r.co2ppm,
+      battery: r.battery,
     }
   }).reverse()
 }
 
 IOmonitor.on('connection', async socket => {
-  socket.emit('lastRecords', await getLast(600))
+  socket.emit('lastRecords', await getLast())
 })
 
 app.get('/', async function (req, res) {
@@ -61,6 +62,7 @@ app.get('/zawarudo', async function (req, res) {
       timestamp: new Date(),
       temperature: req.query.t,
       co2ppm: req.query.c,
+      battery: req.query.battery,
     }
     new Monitor(record).save()
     IOmonitor.emit('newRecord', record)
@@ -68,19 +70,21 @@ app.get('/zawarudo', async function (req, res) {
   res.send('')
 })
 if (process.env.NODE_ENV !== 'production') {
-  let lastDate
   setInterval(async () => {
-    let last = await getLast(1)
-
-    if (lastDate !== last[0].timestamp) {
-      IOmonitor.emit('newRecord', last[0])
-      lastDate = last[0].timestamp
-    }
-
+    let last = await Monitor.findOne({}).sort('-timestamp')
+    IOmonitor.emit('newRecord', last)
   }, 1000)
 }
 
 const PORT = parseInt(process.env.PORT) || 3000
-http.listen(PORT, function () {
-  console.log('Example app listening on port 3000!')
+
+mongoose.connect(`mongodb://${DB_HOST}:${DB_PORT}/room-monitor`, {
+  useNewUrlParser: true,
+  reconnectTries: Number.MAX_VALUE,
+}).then(() => {
+  http.listen(PORT, function () {
+    console.log(`Room Monitor app started on port ${PORT}`)
+  })
+}, err => {
+  console.log(err)
 })
