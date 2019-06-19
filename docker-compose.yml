@@ -3,16 +3,7 @@ services:
   db:
     image: "mongo:3-stretch"
     volumes:
-      - ~/db:/data/db
-  # mongo-express:
-  #   image: "mongo-express:latest"
-  #   environment:
-  #     ME_CONFIG_MONGODB_SERVER: db
-  #     WAIT_HOSTS: db:27017
-  #   depends_on:
-  #     - db
-  #   ports:
-  #     - "4001:8081"
+      - ~/mongodb:/data/db
   app:
     build: .
     environment:
