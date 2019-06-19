@@ -27,9 +27,9 @@ const Monitor = mongoose.model('Monitor', {
 
 let IOmonitor = io.of('/monitor')
 
-async function getLast(limit = 10){
+async function getLast(minutes = 10){
   let last = await Monitor.find({
-    timestamp: {$gte: moment().subtract(1, 'hours')}
+    timestamp: {$gte: moment().subtract(minutes, 'minutes')}
   }).sort('-timestamp').exec()
   return last.map(r => {
     return {
@@ -42,7 +42,10 @@ async function getLast(limit = 10){
 }
 
 IOmonitor.on('connection', async socket => {
-  socket.emit('lastRecords', await getLast())
+  socket.emit('lastRecords', {
+    data: await getLast(5),
+    title: 'ROOM MONITOR, last 5 minutes'
+  })
 })
 
 app.get('/', async function (req, res) {
@@ -69,6 +72,7 @@ app.get('/zawarudo', async function (req, res) {
   }
   res.send('')
 })
+
 if (process.env.NODE_ENV !== 'production') {
   setInterval(async () => {
     let last = await Monitor.findOne({}).sort('-timestamp')
