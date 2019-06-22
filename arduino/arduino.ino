@@ -1,59 +1,71 @@
 /*
   Using Thread to control RGB LED and Counter
  */
-
 #include "config.h"
+void log(String l){
+  if(DEBUG){
+    Serial.println(l);
+  }
+}
+
 #include "rgb_lcd.h"
 #include <Wire.h>
 #include <Thread.h>
 #include <ThreadController.h>
+#include <LWiFi.h>
+#include <LWiFiServer.h>
 
 // global variables
 rgb_lcd lcd;
 unsigned int temperature;
 unsigned long CO2PPM;
 unsigned int temperature_offset = 2;
+bool show_message = false;
+bool offline_mode = false;
+LWiFiServer server(80);
 
 // local class and function
+#include "WifiConnectionThread.h"
 #include "RGBThread.h"
 #include "CO2Sensor.h"
 #include "HTTPServerThread.h"
 
 RGBThread rgbThread = RGBThread();
-//CounterThread counterThread = CounterThread();
 CO2SensorThread co2SensorThread = CO2SensorThread();
 HTTPServerThread httpServerThread = HTTPServerThread();
+WifiConnectionThread wifiConnectionThread = WifiConnectionThread();
+
 // Instantiate a new ThreadController
 ThreadController controller = ThreadController();
 
-void setup() {
-  sensor.begin(9600);
-  Serial.begin(12800);
-  LWiFi.begin();
-  lcd.begin(16, 2);
-  setupWIFI();
 
-  // boot screen
-  for(int i = 16; i >= 0; i--){
-    lcd.clear();
-    lcd.setCursor(i,0);
-    lcd.print(BOOTMSG1);
-    lcd.setCursor(i,1);
-    lcd.print(BOOTMSG2);
-    delay(100);
+void setup() {
+  if(DEBUG){
+    Serial.begin(12800);
   }
 
-  rgbThread.setInterval(7);
-  controller.add(&rgbThread);
-//  controller.add(&counterThread);
-//  counterThread.setInterval(1000);
-
+  LWiFi.begin();
+  sensor.begin(9600);
+  lcd.begin(16, 2);
+  // boot screen
+  // for(int i = 16; i >= 0; i--){
+  //   lcd.clear();
+  //   lcd.setCursor(i,0);
+  //   lcd.print(BOOTMSG1);
+  //   lcd.setCursor(i,1);
+  //   lcd.print(BOOTMSG2);
+  //   delay(100);
+  // }
+  connectToAP();
+  wifiConnectionThread.setInterval(1000 * 60 * 5);
+  httpServerThread.setInterval(10);
   co2SensorThread.setInterval(500);
-  controller.add(&co2SensorThread);
+  rgbThread.setInterval(7);
 
-  httpServerThread.setInterval(100);
   controller.add(&httpServerThread);
-//  Serial.println("ready to start");
+  controller.add(&co2SensorThread);
+  controller.add(&rgbThread);
+  controller.add(&wifiConnectionThread);
 }
 
 void loop() {

@@ -34,7 +34,10 @@ bool CO2SensorDataRecieve(void)
   }
 
   CO2PPM = (int)data[2] * 256 + (int)data[3];
+  if (CO2PPM >= 9999) CO2PPM = 9999;
+
   temperature = (int)data[4] - 42 - temperature_offset;
+  if(temperature >= 50) temperature = 50;
 
   return true;
 }
@@ -69,8 +72,11 @@ class CO2SensorThread : public Thread
 
       if (temperature <= 100) {
         lcd.clear();
-        lcd.setCursor(positionCounter, 0);
-        lcd.print(BOOTMSG2);
+        if (!show_message)
+        {
+          lcd.setCursor(positionCounter, 0);
+          lcd.print(BOOTMSG2);
+        }
         lcd.setCursor(0, 1);
         lcd.print(String(temperature) + char(223) + "c CO2:" + String(CO2PPM) + "PPM");
       }

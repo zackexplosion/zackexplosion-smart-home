@@ -1,18 +1,20 @@
 class RGBThread: public Thread
 {
  int i = 0;
+//  int r, g, b = 0;
  int currentColor = 0;
  bool increase = true;
  unsigned char color = REG_RED;
  void run(){
    lcd.setPWM(color, i);
+  //  lcd.setRGB(i, 100, 100);
    if(increase) {
      i++;
    } else{
      i--;
    }
 
-   if(i == 254) {
+   if(i == 255) {
      increase = false;
    } else if(i == 0){
      increase = true;

@@ -1,4 +1,5 @@
 const { TOKEN } = process.env
+const DEFAULT_SENSOR_IP = '10.1.1.106'
 const express = require('express')
 const app = express()
 const moment = require('moment')
@@ -73,12 +74,32 @@ app.get('/', async function (req, res) {
 //   res.send('')
 // })
 
-if (process.env.NODE_ENV !== 'production') {
-  setInterval(async () => {
-    let last = await Monitor.findOne({}).sort('-timestamp')
-    IOmonitor.emit('newRecord', last)
-  }, 1000)
+const got = require('got');
+
+setInterval(async () => {
+
+}, 1000)
+
+async function getCO2PPMFromSensor(sensor = DEFAULT_SENSOR_IP) {
+	try {
+		const response = await got('http://10.1.1.106');
+		console.log(response.body);
+	} catch (error) {
+		console.log(error.response.body);
+	}
+  setTimeout(getCO2PPMFromSensor, 1000)
 }
+
+getCO2PPMFromSensor();
+
+
+
+// if (process.env.NODE_ENV !== 'production') {
+//   setInterval(async () => {
+//     let last = await Monitor.findOne({}).sort('-timestamp')
+//     IOmonitor.emit('newRecord', last)
+//   }, 1000)
+// }
 
 const PORT = parseInt(process.env.PORT) || 3000
 
