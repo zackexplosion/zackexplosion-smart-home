@@ -14,7 +14,7 @@ class RGBThread: public Thread
 
    if(i == 254) {
      increase = false;
-   } else if(i == 0){                                                                                                        
+   } else if(i == 0){
      increase = true;
      currentColor++;
 

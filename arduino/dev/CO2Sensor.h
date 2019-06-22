@@ -5,9 +5,6 @@ const unsigned char cmd_get_sensor[] =
         0x00, 0x00, 0x00, 0x79};
 
 unsigned char dataRevice[9];
-unsigned int temperature;
-unsigned long CO2PPM;
-
 bool CO2SensorDataRecieve(void)
 {
   byte data[9];
@@ -37,17 +34,46 @@ bool CO2SensorDataRecieve(void)
   }
 
   CO2PPM = (int)data[2] * 256 + (int)data[3];
-  temperature = (int)data[4] - 42;
+  temperature = (int)data[4] - 42 - temperature_offset;
 
   return true;
 }
 
-class CO2SensorThread: public Thread
+class CO2SensorThread : public Thread
 {
-  void run(){
-    if( CO2SensorDataRecieve()) {
-      lcd.setCursor(0,1);
-      lcd.print(String(temperature) + char(223) + "c,CO2:" + String(CO2PPM) + "PPM");
+  int positionCounter = 0;
+  bool moveRight = true;
+  void run()
+  {
+    if (CO2SensorDataRecieve())
+    {
+
+      if (moveRight)
+      {
+        positionCounter++;
+      }
+      else
+      {
+        positionCounter--;
+      }
+
+      if (positionCounter >= 3)
+      {
+        moveRight = false;
+      }
+
+      if (positionCounter == 0)
+      {
+        moveRight = true;
+      }
+
+      if (temperature <= 100) {
+        lcd.clear();
+        lcd.setCursor(positionCounter, 0);
+        lcd.print(BOOTMSG2);
+        lcd.setCursor(0, 1);
+        lcd.print(String(temperature) + char(223) + "c CO2:" + String(CO2PPM) + "PPM");
+      }
     }
     runned();
   }

@@ -58,20 +58,20 @@ app.get('/', async function (req, res) {
 // })
 
 // recorder
-app.get('/zawarudo', async function (req, res) {
+// app.get('/zawarudo', async function (req, res) {
 
-  if ( req.query.token == TOKEN) {
-    let record = {
-      timestamp: new Date(),
-      temperature: req.query.t,
-      co2ppm: req.query.c,
-      battery: req.query.battery,
-    }
-    new Monitor(record).save()
-    IOmonitor.emit('newRecord', record)
-  }
-  res.send('')
-})
+//   if ( req.query.token == TOKEN) {
+//     let record = {
+//       timestamp: new Date(),
+//       temperature: req.query.t,
+//       co2ppm: req.query.c,
+//       battery: req.query.battery,
+//     }
+//     new Monitor(record).save()
+//     IOmonitor.emit('newRecord', record)
+//   }
+//   res.send('')
+// })
 
 if (process.env.NODE_ENV !== 'production') {
   setInterval(async () => {
