@@ -2,3 +2,5 @@ node_modules
 .envrc
 .vscode
 config.h
+wifi_settings.h
+settings.h

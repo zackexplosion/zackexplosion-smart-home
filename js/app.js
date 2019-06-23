@@ -134,3 +134,10 @@ socket.on('lastRecords', ({ data, title }) => {
 //     title: renderTitle(data),
 //     // xaxis: { tickvals }
 //   })
+document.getElementById('switch-on').addEventListener('click', e => {
+  socket.emit('switch-on')
+})
+
+document.getElementById('switch-off').addEventListener('click', e => {
+  socket.emit('switch-off')
+})

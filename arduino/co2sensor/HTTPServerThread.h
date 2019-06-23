@@ -13,7 +13,7 @@ class HTTPServerThread : public Thread
   void run()
   {
     LWiFiClient client = server.available();
-    if (client && client.connected() && client.available() && CO2PPM != 0)
+    if (client && client.connected() && client.available() && CO2PPM != 0 && !offline_mode)
     {
       log("new client ");
 

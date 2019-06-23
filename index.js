@@ -1,5 +1,8 @@
-const { TOKEN } = process.env
-const DEFAULT_SENSOR_IP = '10.1.1.106'
+const {
+  SWITCH_ACCESS_TOKEN,
+  DEFAULT_SENSOR_IP,
+  SWITCH_ACCESS_TOKEN
+} = process.env
 const express = require('express')
 const app = express()
 const moment = require('moment')
@@ -12,6 +15,7 @@ app.use(express.static(path.join(__dirname, 'dist')))
 const mongoose = require('mongoose')
 const http = require('http').Server(app)
 const io = require('socket.io')(http)
+const IOmonitor = io.of('/monitor')
 
 require(path.join(__dirname, 'lib', 'hashpath'))(app)
 
@@ -25,8 +29,6 @@ const Monitor = mongoose.model('Monitor', {
   co2ppm: Number,
   battery: Number
 })
-
-let IOmonitor = io.of('/monitor')
 
 async function getLast(minutes = 10){
   let last = await Monitor.find({
@@ -42,10 +44,39 @@ async function getLast(minutes = 10){
   }).reverse()
 }
 
+async function switchOn (target_switch) {
+  try {
+    const response = await got(`http://${target_switch}/on?token=${SWITCH_ACCESS_TOKEN}`, {json: true});
+    console.log(response.body)
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+function switchOff (target_switch) {
+  return got(`http://${target_switch}/on?token=${SWITCH_ACCESS_TOKEN}`, {json: true});
+}
+
 IOmonitor.on('connection', async socket => {
   socket.emit('lastRecords', {
     data: await getLast(5),
     title: 'ROOM MONITOR, last 5 minutes'
+  })
+
+  socket.on('switch-on', async data => {
+    try {
+      await switchOn(data)
+    } catch (error) {
+      console.log(error);
+    }
+  })
+
+  socket.on('switch-off', async data => {
+    try {
+      await switchOff(data)
+    } catch (error) {
+      console.log(error);
+    }
   })
 })
 
@@ -53,39 +84,28 @@ app.get('/', async function (req, res) {
   res.render('index')
 })
 
-// app.get('/last', async function (req, res) {
-//   const limit = req.query.limit || 600
-//   return res.json(await getLast(limit))
-// })
 
-// recorder
-// app.get('/zawarudo', async function (req, res) {
-
-//   if ( req.query.token == TOKEN) {
-//     let record = {
-//       timestamp: new Date(),
-//       temperature: req.query.t,
-//       co2ppm: req.query.c,
-//       battery: req.query.battery,
-//     }
-//     new Monitor(record).save()
-//     IOmonitor.emit('newRecord', record)
-//   }
-//   res.send('')
-// })
-
-const got = require('got');
-
-setInterval(async () => {
-
-}, 1000)
+const got = require('got')
 
 async function getCO2PPMFromSensor(sensor = DEFAULT_SENSOR_IP) {
 	try {
-		const response = await got('http://10.1.1.106');
-		console.log(response.body);
+    const response = await got('http://' + sensor, {json: true});
+    const co2ppm = parseInt(response.body.co2ppm)
+    let record = {
+      timestamp: new Date(),
+      temperature: response.body.temperature,
+      co2ppm,
+    }
+    IOmonitor.emit('newRecord', record)
+    record = await new Monitor(record).save()
+
+    if(co2ppm >= 800){
+      switchOn()
+    } else {
+      switchOff()
+    }
 	} catch (error) {
-		console.log(error.response.body);
+		console.log(error);
 	}
   setTimeout(getCO2PPMFromSensor, 1000)
 }

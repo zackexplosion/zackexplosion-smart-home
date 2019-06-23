@@ -20,8 +20,8 @@ rgb_lcd lcd;
 unsigned int temperature;
 unsigned long CO2PPM;
 unsigned int temperature_offset = 2;
-bool show_message = false;
-bool offline_mode = false;
+static bool show_message = false;
+static bool offline_mode = false;
 LWiFiServer server(80);
 
 // local class and function
@@ -56,7 +56,8 @@ void setup() {
   //   lcd.print(BOOTMSG2);
   //   delay(100);
   // }
-  connectToAP();
+
+  connectToAP(WIFI_AP);
   wifiConnectionThread.setInterval(1000 * 60 * 5);
   httpServerThread.setInterval(10);
   co2SensorThread.setInterval(500);
@@ -68,6 +69,15 @@ void setup() {
   controller.add(&wifiConnectionThread);
 }
 
+//int free_ram()
+//{
+//  extern int __heap_start, *__brkval;
+//  int v;
+//  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
+//}
+
 void loop() {
   controller.run();
+  Serial.print("memory:");
+//  Serial.println(free_ram());
 }
