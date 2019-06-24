@@ -9,10 +9,11 @@ const CleanWebpackPlugin = require('clean-webpack-plugin')
 const webpackStream = require('webpack-stream')
 const browserSync = require('browser-sync').create()
 const path = require('path')
+const app_dir = './monitor-server'
 const webpack_param = {
   mode: NODE_ENV,
   entry: {
-    app: `./js/app.js`,
+    app: `.${app_dir}/js/app.js`,
   },
   output: {
     filename: '[name]-[chunkhash].js',
@@ -41,7 +42,7 @@ const webpack_param = {
 }
 
 function webpack (done) {
-  return src('./js/app.js')
+  return src(`.${app_dir}/js/app.js`)
     .pipe(webpackStream(webpack_param))
     .pipe(dest('dist'))
     .on('error', e => {
@@ -55,7 +56,7 @@ function webpack (done) {
 }
 
 function css() {
-  return src('sass/*.sass')
+  return src(`${app_dir}/sass/*.sass`)
     // .pipe(sourcemaps.init())
     .pipe(sourcemaps.init())
     .pipe(sass())
@@ -69,7 +70,7 @@ function css() {
 const build = parallel(css, webpack)
 function startNodemon (cb) {
   nodemon({
-    script: 'index.js',
+    script: `${app_dir}/index.js`,
     ext: '*.js',
     ignore : [
       'gulpfile.js',
@@ -111,9 +112,9 @@ function startBrowserSync (cb) {
 
 
 function watcher (cb) {
-  watch(['./views/*.pug']).on('change', browserSync.reload)
-  watch(['./sass/*.sass'], css)
-  watch(['./js/*.js'], webpack)
+  watch([`.${app_dir}/views/*.pug`]).on('change', browserSync.reload)
+  watch([`.${app_dir}/sass/*.sass`], css)
+  watch([`.${app_dir}/js/*.js`], webpack)
   cb()
 }
 

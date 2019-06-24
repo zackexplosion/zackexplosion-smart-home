@@ -28,11 +28,20 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// Create your own settings.h or just uncomment.
+// The file include those constant need to define.
+
+// const char *ssid = "";
+// const char *password = "";
+// const char *TOKEN = "";
+
+#include "settings.h"
+
+
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
-#include "settings.h"
 
 #define RELAY 0 // relay connected to  GPIO0
 #define DELAY_BETWEEN_SWITCH 2000
@@ -42,6 +51,22 @@ int switchStatus = 0;
 ESP8266WebServer server(80);
 
 const int led = 13;
+
+void switchOn() {
+  if( switchStatus == 0) {
+    Serial.println("Switch On");
+    digitalWrite(RELAY, LOW);
+    switchStatus = 1; 
+  }
+}
+
+void switchOff() {
+  if( switchStatus == 1) {
+    Serial.println("Switch Off");
+    digitalWrite(RELAY, HIGH);
+    switchStatus = 0; 
+  }
+}
 
 void handleRoot() {
   digitalWrite(led, 1);
@@ -59,13 +84,6 @@ void handleSwitchOn(){
   delay(DELAY_BETWEEN_SWITCH);
 }
 
-void switchOn() {
-  if( switchStatus == 0) {
-    digitalWrite(RELAY, LOW);
-    switchStatus = 1; 
-  }
-}
-
 void handleSwitchOff(){
   digitalWrite(led, 1);
   if ( server.arg("token") == TOKEN){
@@ -77,22 +95,16 @@ void handleSwitchOff(){
 }
 
 void renderStatus() {
-  server.send(200, "application/json", "{\"status\": " + String(switchStatus) + "}");
-}
-
-void switchOff() {
-  if( switchStatus == 1) {
-    digitalWrite(RELAY, HIGH);
-    switchStatus = 0; 
-  }
+  server.send(200, "application/json", "{\"status\": " + String(switchStatus) + ", \"uptime\": " +  (millis() / 1000) + "}");
 }
 
 void setup(void) {
   pinMode(led, OUTPUT);
   digitalWrite(led, 0);
 
+  // make sure switch is off on boot.  
   pinMode(RELAY,OUTPUT);
-  switchOff();
+  digitalWrite(RELAY, HIGH);
 
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
