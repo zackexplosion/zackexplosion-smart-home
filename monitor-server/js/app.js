@@ -22,7 +22,9 @@ for (let index = 1; index <= 60/period; index++) {
 }
 tickvals = tickvals.reverse()
 
+var rendered = false
 socket.on('lastRecords', ({ data, title }) => {
+  if(rendered) return
 
   render_data = {
     y: data.map(d => { return d.co2ppm}),
@@ -42,12 +44,12 @@ socket.on('lastRecords', ({ data, title }) => {
   {
     responsive: true
   })
+
+  rendered = true
   socket.on('newRecord', data => {
-  
     // remove last data
     render_data.y.shift()
     render_data.y.push(data.co2ppm)
-  
     Plotly.update(chartID, {
       y: [render_data.y],
     }, {
@@ -55,7 +57,12 @@ socket.on('lastRecords', ({ data, title }) => {
     })
   })
 })
+import Vue from 'Vue'
+import App from '../components/app.vue'
 
+new Vue({
+  render: h => h(App),
+}).$mount('#app')
 // const chartID = 'chart'
 // const socket = io('/monitor')
 // const labelFormater = 'HH:mm'
@@ -134,10 +141,3 @@ socket.on('lastRecords', ({ data, title }) => {
 //     title: renderTitle(data),
 //     // xaxis: { tickvals }
 //   })
-document.getElementById('switch-on').addEventListener('click', e => {
-  socket.emit('switch-on')
-})
-
-document.getElementById('switch-off').addEventListener('click', e => {
-  socket.emit('switch-off')
-})

@@ -39,32 +39,34 @@
 
 
 #include <ESP8266WiFi.h>
-#include <WiFiClient.h>
+//#include <WiFiClient.h>
 #include <ESP8266WebServer.h>
-#include <ESP8266mDNS.h>
+//#include <ESP8266mDNS.h>
 
 #define RELAY 0 // relay connected to  GPIO0
 #define DELAY_BETWEEN_SWITCH 2000
 
-int switchStatus = 0;
-
+static bool isSwitchOn = false;
+static int lastSwitchChange = 0;
 ESP8266WebServer server(80);
 
 const int led = 13;
 
+
 void switchOn() {
-  if( switchStatus == 0) {
+  if(!isSwitchOn && millis() - lastSwitchChange > DELAY_BETWEEN_SWITCH) {
     Serial.println("Switch On");
     digitalWrite(RELAY, LOW);
-    switchStatus = 1; 
+    isSwitchOn = true; 
   }
 }
 
 void switchOff() {
-  if( switchStatus == 1) {
+  if(isSwitchOn && millis() - lastSwitchChange > DELAY_BETWEEN_SWITCH) {
     Serial.println("Switch Off");
     digitalWrite(RELAY, HIGH);
-    switchStatus = 0; 
+    isSwitchOn = false;
+    lastSwitchChange = millis();
   }
 }
 
@@ -81,7 +83,6 @@ void handleSwitchOn(){
   }
   renderStatus();
   digitalWrite(led, 0);
-  delay(DELAY_BETWEEN_SWITCH);
 }
 
 void handleSwitchOff(){
@@ -95,7 +96,7 @@ void handleSwitchOff(){
 }
 
 void renderStatus() {
-  server.send(200, "application/json", "{\"status\": " + String(switchStatus) + ", \"uptime\": " +  (millis() / 1000) + "}");
+  server.send(200, "application/json", "{\"isSwitchOn\": " + String(isSwitchOn) + ", \"uptime\": " +  millis() + "}");
 }
 
 void setup(void) {
@@ -103,7 +104,9 @@ void setup(void) {
   digitalWrite(led, 0);
 
   // make sure switch is off on boot.  
-  pinMode(RELAY,OUTPUT);
+  pinMode(RELAY, OUTPUT);
+  // prevent fast switch
+  delay(2000);
   digitalWrite(RELAY, HIGH);
 
   Serial.begin(115200);
@@ -118,14 +121,14 @@ void setup(void) {
   }
 
   Serial.println("");
-  Serial.print("Connected to ");
+  Serial.print(F("Connected to "));
   Serial.println(ssid);
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
-  if (MDNS.begin("esp8266")) {
-    Serial.println("MDNS responder started");
-  }
+//  if (MDNS.begin("esp8266")) {
+//    Serial.println("MDNS responder started");
+//  }
 
   server.on("/", handleRoot);
   server.on("/on", handleSwitchOn);
@@ -134,7 +137,14 @@ void setup(void) {
   Serial.println("HTTP server started");
 }
 
+int freeRam () 
+{
+  extern int __heap_start, *__brkval; 
+  int v; 
+  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
+}
+
 void loop(void) {
   server.handleClient();
-  MDNS.update();
+//  MDNS.update();
 }
