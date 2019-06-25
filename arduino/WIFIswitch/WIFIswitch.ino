@@ -57,7 +57,8 @@ void switchOn() {
   if(!isSwitchOn && millis() - lastSwitchChange > DELAY_BETWEEN_SWITCH) {
     Serial.println("Switch On");
     digitalWrite(RELAY, LOW);
-    isSwitchOn = true; 
+    isSwitchOn = true;
+    lastSwitchChange = millis();
   }
 }
 
@@ -92,7 +93,6 @@ void handleSwitchOff(){
   }
   renderStatus();
   digitalWrite(led, 0);
-  delay(DELAY_BETWEEN_SWITCH);
 }
 
 void renderStatus() {
@@ -106,8 +106,8 @@ void setup(void) {
   // make sure switch is off on boot.  
   pinMode(RELAY, OUTPUT);
   // prevent fast switch
-  delay(2000);
-  digitalWrite(RELAY, HIGH);
+//  delay(2000);
+//  digitalWrite(RELAY, HIGH);
 
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);

@@ -13,9 +13,11 @@
       <tr v-for="s, key in switchs">
         <td>{{key+1}}</td>
         <td>{{s.name}}</td>
-        <td v-bind:class="{ 'switch-down': s.uptime === 0}">{{formatUptime(s.uptime)}}</td>
-        <td v-if="s.uptime > 0">
-          <div class="onoffswitch">
+        <td v-bind:class="{ 'switch-down': s.uptime === 0}">
+          {{formatUptime(s.uptime)}}
+        </td>
+        <td>
+          <div v-if="s.uptime > 0" class="onoffswitch">
             <input
               type="checkbox"
               name="onoffswitch"
@@ -70,6 +72,7 @@ export default {
     })
 
     socket.on('updateSwitchStatus', data => {
+      // console.log(data)
       this.switchs = this.switchs.map(s => {
         let d = data.find(_ => _.name == s.name)
         s.uptime = d.uptime
@@ -79,3 +82,8 @@ export default {
   }
 };
 </script>
+
+<style lang="sass">
+#switch-control
+  width: 100%
+</style>

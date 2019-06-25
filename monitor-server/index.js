@@ -14,7 +14,10 @@ const io = require('socket.io')(http)
 const IOmonitor = io.of('/monitor')
 
 require(path.join(__dirname, 'lib', 'hashpath'))(app)
-require(path.join(__dirname, 'lib', 'handle-switch'))(io)
+const {
+  switchOn,
+  switchOff
+} = require(path.join(__dirname, 'lib', 'handle-switch'))(io)
 
 // setup view engine
 app.set('view engine', 'pug')
@@ -53,6 +56,9 @@ app.get('/', async function (req, res) {
   res.render('index')
 })
 
+const CO2_AIR_INPUT_OPEN_ON = 1000
+const CO2_AIR_INPUT_CLOSE_ON = 800
+
 async function getCO2PPMFromSensor() {
   const sensor = config.devices.find(d => d.type == 'co2sensor')
 	try {
@@ -66,8 +72,16 @@ async function getCO2PPMFromSensor() {
     }
     IOmonitor.emit('newRecord', record)
     record = await new Monitor(record).save()
+
+
+    if(co2ppm >= CO2_AIR_INPUT_OPEN_ON) {
+      switchOn('Switch1')
+    } else if(co2ppm <= CO2_AIR_INPUT_CLOSE_ON) {
+      switchOff('Switch1')
+    }
+
 	} catch (error) {
-		console.log(error.code);
+		console.log(error.code)
 	}
   setTimeout(getCO2PPMFromSensor, 1000)
 }
