@@ -46,8 +46,9 @@
 #define RELAY 0 // relay connected to  GPIO0
 #define DELAY_BETWEEN_SWITCH 2000
 
-static bool isSwitchOn = false;
-static int lastSwitchChange = 0;
+bool isSwitchOn = false;
+int lastSwitchChange = 0;
+char _version[] = "1.0";
 ESP8266WebServer server(80);
 
 const int led = 13;
@@ -96,7 +97,7 @@ void handleSwitchOff(){
 }
 
 void renderStatus() {
-  server.send(200, "application/json", "{\"isSwitchOn\": " + String(isSwitchOn) + ", \"uptime\": " +  millis() + "}");
+  server.send(200, "application/json", "{\"isSwitchOn\": " + String(isSwitchOn) + ", \"uptime\": " +  millis() + ", \"version\": \"" +  String(_version) + "\"}");
 }
 
 void setup(void) {
@@ -106,8 +107,8 @@ void setup(void) {
   // make sure switch is off on boot.  
   pinMode(RELAY, OUTPUT);
   // prevent fast switch
-//  delay(2000);
-//  digitalWrite(RELAY, HIGH);
+  delay(2000);
+  digitalWrite(RELAY, HIGH);
 
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);

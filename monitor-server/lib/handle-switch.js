@@ -65,6 +65,7 @@ async function getSwitchStatus(){
       .catch(res => {
         return parseSwitchResponse(s, {
           isSwitchOn: false,
+          uptime: 0
         })
       })
   }))
@@ -73,15 +74,9 @@ async function getSwitchStatus(){
   } else {
     switch_status = switch_status.map(s => {
       let d = data.find(_ => _.name == s.name)
-      if(d) {
-        return d
-      } else {
-        return s
-      }
+      return d ? d : s
     })
   }
-
-  // console.log(switch_status)
 }
 
 module.exports = io => {
@@ -101,11 +96,7 @@ module.exports = io => {
       try {
         let data = await controlSwitch(_switch)
         switch_status = switch_status.map(s => {
-          if(s.name == data.name) {
-            return data
-          } else {
-            return s
-          }
+          return (s.name == data.name) ? data : s
         })
         return done(null, data)
       } catch (error) {

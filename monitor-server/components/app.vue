@@ -5,6 +5,7 @@
         <th>#</th>
         <th>Name</th>
         <th>Uptime(active)</th>
+        <th>Version</th>
         <th>Control</th>
       </tr>
     </thead>
@@ -16,6 +17,7 @@
         <td v-bind:class="{ 'switch-down': s.uptime === 0}">
           {{formatUptime(s.uptime)}}
         </td>
+        <td>{{s.version}}</td>
         <td>
           <div v-if="s.uptime > 0" class="onoffswitch">
             <input
