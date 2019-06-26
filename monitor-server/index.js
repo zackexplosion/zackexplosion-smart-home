@@ -2,8 +2,6 @@ const express = require('express')
 const app = express()
 const moment = require('moment')
 const path = require('path')
-const got = require('got')
-const config = require('./config.js')
 const DB_HOST = process.env.DB_HOST || 'db'
 const DB_PORT = process.env.DB_PORT || 27017
 app.use(express.static(path.join(__dirname, 'dist')))
@@ -18,6 +16,28 @@ const {
   switchOn,
   switchOff
 } = require(path.join(__dirname, 'lib', 'handle-switch'))(io)
+
+
+const CO2_AIR_INPUT_OPEN_ON = 1000
+const CO2_AIR_INPUT_CLOSE_ON = 800
+
+async function onCO2SensorRecieve(record) {
+  IOmonitor.emit('newRecord', record)
+  await new Monitor(record).save()
+  const {
+    co2ppm
+  } = record
+  if (co2ppm >= CO2_AIR_INPUT_OPEN_ON) {
+    switchOn('Switch1')
+  } else if(co2ppm <= CO2_AIR_INPUT_CLOSE_ON) {
+    switchOff('Switch1')
+  }
+}
+
+require(path.join(__dirname, 'lib', 'handle-co2sensor'))({
+  onCO2SensorRecieve,
+  io
+})
 
 // setup view engine
 app.set('view engine', 'pug')
@@ -55,38 +75,6 @@ IOmonitor.on('connection', async socket => {
 app.get('/', async function (req, res) {
   res.render('index')
 })
-
-const CO2_AIR_INPUT_OPEN_ON = 1000
-const CO2_AIR_INPUT_CLOSE_ON = 800
-
-async function getCO2PPMFromSensor() {
-  const sensor = config.devices.find(d => d.type == 'co2sensor')
-	try {
-    const response = await got('http://' + sensor.ip, {json: true});
-    const co2ppm = parseInt(response.body.co2ppm)
-    let record = {
-      sensor: sensor.name,
-      timestamp: new Date(),
-      temperature: response.body.temperature,
-      co2ppm,
-    }
-    IOmonitor.emit('newRecord', record)
-    record = await new Monitor(record).save()
-
-
-    if(co2ppm >= CO2_AIR_INPUT_OPEN_ON) {
-      switchOn('Switch1')
-    } else if(co2ppm <= CO2_AIR_INPUT_CLOSE_ON) {
-      switchOff('Switch1')
-    }
-
-	} catch (error) {
-		console.log(error.code)
-	}
-  setTimeout(getCO2PPMFromSensor, 1000)
-}
-
-getCO2PPMFromSensor();
 
 const PORT = parseInt(process.env.PORT) || 3000
 

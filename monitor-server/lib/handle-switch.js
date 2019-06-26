@@ -18,7 +18,7 @@ function parseSwitchResponse(_switch, data) {
 
 function switchOn(name){
   let _switch = switch_status.find(_ => _.name === name)
-  if(_switch.isSwitchOn) return
+  if(!_switch || _switch.isSwitchOn) return
   controlSwitch({
     name,
     isSwitchOn: true
@@ -27,7 +27,7 @@ function switchOn(name){
 
 function switchOff(name){
   let _switch = switch_status.find(_ => _.name === name)
-  if(!_switch.isSwitchOn) return
+  if(!_switch || !_switch.isSwitchOn) return
   controlSwitch({
     name,
     isSwitchOn: false

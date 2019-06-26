@@ -78,7 +78,6 @@ class CO2SensorThread : public Thread
     lcd.setCursor(0, 1);
     lcd.print(String(temperature) + char(223) + "c CO2:" + String(CO2PPM) + "PPM");
 
-    log(availableMemory());
     runned();
   }
 };

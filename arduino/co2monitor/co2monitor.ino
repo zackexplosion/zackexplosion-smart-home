@@ -59,7 +59,7 @@ void setup() {
 
   connectToAP(WIFI_AP);
   wifiConnectionThread.setInterval(1000 * 60 * 5);
-  httpServerThread.setInterval(10);
+  httpServerThread.setInterval(5);
   co2SensorThread.setInterval(500);
   rgbThread.setInterval(7);
 
@@ -82,7 +82,7 @@ void loop() {
 // free RAM check for debugging. SRAM for ATmega328p = 2048Kb.
 int availableMemory() {
     // Use 1024 with ATmega168
-    int size = 2048;
+    int size = 1024;
     byte *buf;
     while ((buf = (byte *) malloc(--size)) == NULL);
         free(buf);
