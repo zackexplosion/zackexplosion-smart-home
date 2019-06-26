@@ -9,7 +9,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin')
 const webpackStream = require('webpack-stream')
 const browserSync = require('browser-sync').create()
 const path = require('path')
-const app_dir = './monitor-server'
+const app_dir = '.'
 // webpack.config.js
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 const webpack_param = {
