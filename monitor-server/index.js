@@ -18,19 +18,22 @@ const {
 } = require(path.join(__dirname, 'lib', 'handle-switch'))(io)
 
 
-const CO2_AIR_INPUT_OPEN_ON = 1000
-const CO2_AIR_INPUT_CLOSE_ON = 800
+const CO2_AIR_INPUT_OPEN_ON = 800
+const CO2_AIR_INPUT_CLOSE_ON =600
 
 async function onCO2SensorRecieve(record) {
   IOmonitor.emit('newRecord', record)
   await new Monitor(record).save()
+
+
   const {
     co2ppm
   } = record
+  console.log('co2ppm', co2ppm)
   if (co2ppm >= CO2_AIR_INPUT_OPEN_ON) {
-    switchOn('Switch1')
+    switchOn('Switch2')
   } else if(co2ppm <= CO2_AIR_INPUT_CLOSE_ON) {
-    switchOff('Switch1')
+    switchOff('Switch2')
   }
 }
 

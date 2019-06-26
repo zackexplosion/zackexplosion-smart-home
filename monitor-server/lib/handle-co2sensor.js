@@ -1,12 +1,17 @@
 const config = require('../config.js')
 const got = require('got')
 
-
+let sensors_status
 module.exports = ({
   onCO2SensorRecieve,
   io
   })=> {
   const sensorsIO = io.of('/sensors')
+
+  // init status
+  sensorsIO.on('connection', socket => {
+    socket.emit('updateSensorsStatus', sensors_status)
+  })
 
   async function getCO2PPMFromSensor() {
     const sensor = config.devices.find(d => d.type == 'co2sensor')
@@ -24,7 +29,10 @@ module.exports = ({
       }
       onCO2SensorRecieve(last_record)
       sensor.uptime = response.body.uptime
-      sensorsIO.emit('updateSensorsStatus', [sensor])
+      sensors_status = [sensor]
+
+      // broadcast sensors_status
+      sensorsIO.emit('updateSensorsStatus', sensors_status)
     } catch (error) {
       console.log(error)
     }

@@ -73,12 +73,13 @@ export default {
       this.switchs = data
     })
     socket.on('updateSwitchStatus', data => {
+      this.switchs = data
       // console.log(data)
-      this.switchs = this.switchs.map(s => {
-        let d = data.find(_ => _.name == s.name)
-        s.uptime = d.uptime
-        return s
-      })
+      // this.switchs = this.switchs.map(s => {
+      //   let d = data.find(_ => _.name == s.name)
+      //   s.uptime = d.uptime
+      //   return s
+      // })
     })
   }
 };

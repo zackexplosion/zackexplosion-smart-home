@@ -87,7 +87,7 @@ module.exports = io => {
       if(switch_status.length == 0 ) {
         await getSwitchStatus()
       }
-      socket.emit('initSwitchStatus', switch_status)
+      socket.emit('updateSwitchStatus', switch_status)
     } catch (error) {
       console.error(error.code)
     }
