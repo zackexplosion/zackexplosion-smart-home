@@ -47,6 +47,7 @@ void connectToAP(char *ssid)
     IPAddress ip = LWiFi.localIP();
     lcd.print("IP:" + String(ip[0]) + "." + String(ip[1]) + "." + String(ip[2]) + "." + String(ip[3]));
     server.begin();
+    offline_mode = false;
   } else {
     if(ssid == WIFI_AP2) {
       connectToAP(WIFI_AP2);
