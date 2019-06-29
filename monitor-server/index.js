@@ -19,7 +19,7 @@ const {
 
 
 const CO2_AIR_INPUT_OPEN_ON = 800
-const CO2_AIR_INPUT_CLOSE_ON =600
+const CO2_AIR_INPUT_CLOSE_ON = 600
 
 async function onCO2SensorRecieve(record) {
   IOmonitor.emit('newRecord', record)

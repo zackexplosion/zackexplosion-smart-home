@@ -59,28 +59,29 @@ class HTTPServerThread : public Thread
         if (client.available()) {
 
           // we basically ignores client request, but wait for HTTP request end
-          int c = client.read();
-
-          if (c == '\n' && currentLineIsBlank)
-          {
-            response(client, enterTime);
-            break;
-          }
-          if (c == '\n')
-          {
-            // you're starting a new line
-            currentLineIsBlank = true;
-          }
-          else if (c != '\r')
-          {
-            // you've gotten a character on the current line
-            currentLineIsBlank = false;
-          }
+          // int c = client.read();
+          response(client, enterTime);
+          delay(100);
+          break;
+          // if (c == '\n')
+          // {
+          //   response(client, enterTime);
+          //   delay(100);
+          //   break;
+          // }
+          // if (c == '\n')
+          // {
+          //   // you're starting a new line
+          //   currentLineIsBlank = true;
+          // }
+          // else if (c != '\r')
+          // {
+          //   // you've gotten a character on the current line
+          //   currentLineIsBlank = false;
+          // }
         }
       }
 
-      delay(100);
-      // log("RAM:" + availableMemory());
       client.stop();
     }
     runned();
