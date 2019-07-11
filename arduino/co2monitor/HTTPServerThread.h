@@ -30,7 +30,7 @@ void response(LWiFiClient client, int enterTime = 0) {
   data += ",\"resTime\":";
   data += millis() - enterTime;
   data += "}";
-
+  log(data);
   client.println(data.length());
   client.println();
   client.println(data);
@@ -48,6 +48,7 @@ class HTTPServerThread : public Thread
 //    }
 
     LWiFiClient client = server.available();
+    log(client);
     if (client && CO2PPM != 0)
     {
       // an http request ends with a blank line
@@ -55,19 +56,21 @@ class HTTPServerThread : public Thread
       int enterTime = millis();
       while (client.connected()) {
         // timeout
-        if (millis() - enterTime > 1000) break;
+        if (millis() - enterTime > 1000) {
+          log("time out");
+          break;
+        }
         if (client.available()) {
 
           // we basically ignores client request, but wait for HTTP request end
           // int c = client.read();
           response(client, enterTime);
-          delay(100);
           break;
           // if (c == '\n')
           // {
           //   response(client, enterTime);
           //   delay(100);
-          //   break;
+          //   break;「
           // }
           // if (c == '\n')
           // {
@@ -82,8 +85,8 @@ class HTTPServerThread : public Thread
         }
       }
 
-      client.stop();
     }
+    client.stop();
     runned();
   }
 };

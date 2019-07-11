@@ -44,7 +44,7 @@ void setup() {
     Serial.begin(12800);
   }
 
-  LWiFi.begin();
+  // LWiFi.begin();
   sensor.begin(9600);
   lcd.begin(16, 2);
   // boot screen
@@ -57,16 +57,16 @@ void setup() {
   //   delay(100);
   // }
 
-  connectToAP(WIFI_AP);
+  // connectToAP(WIFI_AP);
   wifiConnectionThread.setInterval(1000 * 60 * 5);
   httpServerThread.setInterval(5);
   co2SensorThread.setInterval(500);
   rgbThread.setInterval(7);
 
-  controller.add(&httpServerThread);
+  // controller.add(&httpServerThread);「
   controller.add(&co2SensorThread);
   controller.add(&rgbThread);
-  controller.add(&wifiConnectionThread);
+  // controller.add(&wifiConnectionThread);
 }
 
 //int free_ram()

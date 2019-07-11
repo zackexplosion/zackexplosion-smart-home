@@ -34,7 +34,7 @@ module.exports = ({
       // broadcast sensors_status
       sensorsIO.emit('updateSensorsStatus', sensors_status)
     } catch (error) {
-      console.log(error)
+      console.log(error.code)
     }
     setTimeout(getCO2PPMFromSensor, 1000)
   }
