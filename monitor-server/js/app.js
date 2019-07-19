@@ -57,7 +57,7 @@ socket.on('lastRecords', ({ data, title }) => {
     })
   })
 })
-import Vue from 'Vue'
+import Vue from 'vue'
 import App from '../components/app.vue'
 
 new Vue({

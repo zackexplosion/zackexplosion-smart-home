@@ -13,6 +13,10 @@ module.exports = ({
     socket.emit('updateSensorsStatus', sensors_status)
   })
 
+  setInterval(function(){
+    sensorsIO.emit('updateSensorsStatus', sensors_status)
+  }, 1000)
+
   async function getCO2PPMFromSensor() {
     const sensor = config.devices.find(d => d.type == 'co2sensor')
     try {
@@ -32,7 +36,7 @@ module.exports = ({
       sensors_status = [sensor]
 
       // broadcast sensors_status
-      sensorsIO.emit('updateSensorsStatus', sensors_status)
+      // sensorsIO.emit('updateSensorsStatus', sensors_status)
     } catch (error) {
       console.log(error.code)
     }
