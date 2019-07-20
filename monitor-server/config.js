@@ -1,6 +1,6 @@
 var devices = [
   {
-    name: 'Switch1',
+    name: 'Air Input Switch',
     type: 'switch',
     ip: '10.1.1.101',
     token: 'YEEEEEEE'
@@ -12,7 +12,13 @@ var devices = [
     token: 'YEEEEEEE'
   },
   {
-    name: 'CO2 Sensor',
+    name: 'Bathroom Humidity',
+    type: 'humidity',
+    ip: '10.1.1.109',
+    token: 'YEEEEEEE'
+  },
+  {
+    name: 'Bedroom CO2',
     type: 'co2sensor',
     ip: '10.1.1.106',
     token: 'YEEEEEEE'
