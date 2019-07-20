@@ -46,7 +46,6 @@ class HTTPServerThread : public Thread
 //      runned();
 //      return;
 //    }
-
     LWiFiClient client = server.available();
     log(client);
     if (client && CO2PPM != 0)
@@ -55,12 +54,17 @@ class HTTPServerThread : public Thread
       boolean currentLineIsBlank = true;
       int enterTime = millis();
       while (client.connected()) {
+        Serial.print("connected,");
         // timeout
         if (millis() - enterTime > 1000) {
           log("time out");
           break;
         }
         if (client.available()) {
+
+          Serial.print("avaiable, ");
+          counter++;
+          Serial.print(counter);
 
           // we basically ignores client request, but wait for HTTP request end
           // int c = client.read();
@@ -82,10 +86,12 @@ class HTTPServerThread : public Thread
           //   // you've gotten a character on the current line
           //   currentLineIsBlank = false;
           // }
+
         }
       }
 
     }
+
     client.stop();
     runned();
   }

@@ -17,6 +17,7 @@ void log(String l){
 
 // global variables
 rgb_lcd lcd;
+unsigned int counter;
 unsigned int temperature;
 unsigned long CO2PPM;
 unsigned int temperature_offset = 2;
@@ -38,13 +39,16 @@ WifiConnectionThread wifiConnectionThread = WifiConnectionThread();
 // Instantiate a new ThreadController
 ThreadController controller = ThreadController();
 
-
 void setup() {
-  if(DEBUG){
-    Serial.begin(12800);
-  }
+  // if(DEBUG){
+  //   Serial.begin(115200);
+  // }
 
-  // LWiFi.begin();
+  Serial.begin(12800);
+
+  LWiFi.begin();
+  connectToAP(WIFI_AP);
+
   sensor.begin(9600);
   lcd.begin(16, 2);
   // boot screen
@@ -57,16 +61,16 @@ void setup() {
   //   delay(100);
   // }
 
-  // connectToAP(WIFI_AP);
   wifiConnectionThread.setInterval(1000 * 60 * 5);
   httpServerThread.setInterval(5);
   co2SensorThread.setInterval(500);
   rgbThread.setInterval(7);
 
-  // controller.add(&httpServerThread);「
+  controller.add(&httpServerThread);
+  controller.add(&wifiConnectionThread);
   controller.add(&co2SensorThread);
   controller.add(&rgbThread);
-  // controller.add(&wifiConnectionThread);
+
 }
 
 //int free_ram()

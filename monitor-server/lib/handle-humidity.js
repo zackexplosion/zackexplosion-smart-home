@@ -17,15 +17,15 @@ module.exports = ({
     sensorsIO.emit('updateHumidityStatus', sensors_status)
   }, 1000)
 
-  async function getSensorData() {
-    config.devices.filer(d => d.type == 'humidity').forEach(sensor => {
+  function getSensorData() {
+    config.devices.filter(d => d.type == 'humidity').forEach(async sensor => {
       try {
         const response = await got('http://' + sensor.ip, {
           json: true,
           timeout: 500
         })
 
-        console.log(response)
+        console.log(response.body)
       } catch (error) {
         console.log(error.code)
       }

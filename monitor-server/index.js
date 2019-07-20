@@ -17,10 +17,7 @@ const {
   switchOff
 } = require(path.join(__dirname, 'lib', 'handle-switch'))(io)
 
-const {
-  // switchOn,
-  // switchOff
-} = require(path.join(__dirname, 'lib', 'handle-humidity'))(io)
+require(path.join(__dirname, 'lib', 'handle-humidity'))({io})
 
 
 const CO2_AIR_INPUT_OPEN_ON = 800

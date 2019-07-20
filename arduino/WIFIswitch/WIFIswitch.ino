@@ -43,7 +43,7 @@
 #include <ESP8266WebServer.h>
 //#include <ESP8266mDNS.h>
 
-#define RELAY 0 // relay connected to  GPIO0
+#define RELAY 2 // relay connected to GPIO0
 #define DELAY_BETWEEN_SWITCH 2000
 
 bool isSwitchOn = false;
@@ -104,7 +104,7 @@ void setup(void) {
   pinMode(led, OUTPUT);
   digitalWrite(led, 0);
 
-  // make sure switch is off on boot.  
+  // make sure switch is off on boot.
   pinMode(RELAY, OUTPUT);
   // prevent fast switch
   delay(2000);
@@ -138,11 +138,11 @@ void setup(void) {
   Serial.println("HTTP server started");
 }
 
-int freeRam () 
+int freeRam ()
 {
-  extern int __heap_start, *__brkval; 
-  int v; 
-  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
+  extern int __heap_start, *__brkval;
+  int v;
+  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
 }
 
 void loop(void) {

@@ -42,10 +42,12 @@
 #include <ESP8266WebServer.h>
 
 #include <SimpleDHT.h>
+#include <Thread.h>
+#include <ThreadController.h>
 
-int pinDHT11 = 2;  //接在GPIO5
+int pinDHT11 = 2;
 SimpleDHT11 dht11;
-
+boolean DEBUG = false;
 byte temperature = 0;
 byte humidity = 0;
 char _version[] = "1.0";
@@ -53,24 +55,19 @@ ESP8266WebServer server(80);
 
 const int led = 13;
 
+ThreadController controller = ThreadController();
+void log(String l){
+  if(DEBUG){
+    Serial.println(l);
+  }
+}
 void handleRoot() {
-  int err = SimpleDHTErrSuccess;
-  if ((err = dht11.read(pinDHT11, &temperature, &humidity, NULL)) != SimpleDHTErrSuccess) {
-    Serial.print("Read DHT11 failed, err="); Serial.println(err);delay(1000);
+
+  if ( server.arg("token") != TOKEN){
+    server.send(200, "application/json", "{\"error\": \"invalid token\"}");
     return;
   }
 
-  Serial.print("Humidity = ");
-  Serial.print((int)humidity);
-  Serial.print("% , ");
-  Serial.print("temperature = ");
-  Serial.print((int)temperature);
-  Serial.println("C ");
-
-  renderStatus();
-}
-
-void renderStatus() {
   String res = "{";
   res += "\"humidity\": " + String(humidity) + ",";
   res += "\"temperature\": " + String(temperature) + ",";
@@ -80,37 +77,59 @@ void renderStatus() {
   server.send(200, "application/json", res);
 }
 
+class SensorDataThread : public Thread
+{
+  void run()
+  {
+    int err = SimpleDHTErrSuccess;
+    if ((err = dht11.read(pinDHT11, &temperature, &humidity, NULL)) != SimpleDHTErrSuccess) {
+//      Serial.print("Read D HT11 failed, err="); Serial.println(err);
+      runned();
+      return;
+    }
+  
+
+    if (DEBUG) {
+      Serial.print("Humidity = ");
+      Serial.print((int)humidity);
+      Serial.print("% , ");
+      Serial.print("temperature = ");
+      Serial.print((int)temperature);
+      Serial.println("C ");
+    }
+    runned();
+  }
+};
+SensorDataThread sensorThread = SensorDataThread();
 void setup(void) {
   pinMode(led, OUTPUT);
-  digitalWrite(led, 0);
+  digitalWrite(led, LOW);
 
-  Serial.begin(115200);
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
-  Serial.println("");
 
   // Wait for connection
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    Serial.print(".");
   }
 
-  Serial.println("");
-  Serial.print(F("Connected to "));
-  Serial.println(ssid);
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
-
-//  if (MDNS.begin("esp8266")) {
-//    Serial.println("MDNS responder started");
-//  }
+  if (DEBUG) {
+    Serial.begin(115200);
+    Serial.println("Connected to ");
+    Serial.println(ssid);
+    Serial.println("IP address: ");
+    Serial.println(WiFi.localIP());
+  }
 
   server.on("/", handleRoot);
   server.begin();
-  Serial.println("HTTP server started");
+  log("HTTP server started");
+  sensorThread.setInterval(1100);
+  controller.add(&sensorThread);
 }
+
 
 void loop(void) {
   server.handleClient();
-//  MDNS.update();
+  controller.run();
 }
