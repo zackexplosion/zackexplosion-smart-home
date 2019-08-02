@@ -4,5 +4,5 @@ node_modules
 config.h
 wifi_settings.h
 settings.h
-config.js
+**/config.js
 docker-compose-proc.yml

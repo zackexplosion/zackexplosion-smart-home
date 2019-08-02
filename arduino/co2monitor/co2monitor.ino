@@ -7,7 +7,8 @@ void log(String l){
     Serial.println(l);
   }
 }
-
+#include "vmpwr.h" //Reboot controller
+#include "LTask.h"
 #include "rgb_lcd.h"
 #include <Wire.h>
 #include <Thread.h>
@@ -82,4 +83,27 @@ void setup() {
 
 void loop() {
   controller.run();
+
+  // reboot
+  if( millis() > (1000 * 60 * 60)) {
+    reset();
+  }
+}
+
+
+extern void vm_reboot_normal_start(void);
+
+void vm_reset(void) {
+  log("calling vm_reboot_normal_start()\r\n");
+  delay(500);
+  vm_reboot_normal_start();
+}
+
+boolean vm_reset_wrap(void* userData) {
+  vm_reset();
+  return true;
+}
+
+void reset(void) {
+  LTask.remoteCall(vm_reset_wrap, NULL);
 }

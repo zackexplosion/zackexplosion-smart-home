@@ -9,40 +9,11 @@ app.use(express.static(path.join(__dirname, 'dist')))
 const mongoose = require('mongoose')
 const http = require('http').Server(app)
 const io = require('socket.io')(http)
-const IOmonitor = io.of('/monitor')
+const web_io = io.of('/web')
+
+const { VALID_SENSOR_ID_LIST } = require('./config')
 
 require(path.join(__dirname, 'lib', 'hashpath'))(app)
-const {
-  switchOn,
-  switchOff
-} = require(path.join(__dirname, 'lib', 'handle-switch'))(io)
-
-require(path.join(__dirname, 'lib', 'handle-humidity'))({io})
-
-
-const CO2_AIR_INPUT_OPEN_ON = 800
-const CO2_AIR_INPUT_CLOSE_ON = 600
-
-async function onCO2SensorRecieve(record) {
-  IOmonitor.emit('newRecord', record)
-  await new Monitor(record).save()
-
-
-  const {
-    co2ppm
-  } = record
-  console.log('co2ppm', co2ppm)
-  if (co2ppm >= CO2_AIR_INPUT_OPEN_ON) {
-    switchOn('Switch2')
-  } else if(co2ppm <= CO2_AIR_INPUT_CLOSE_ON) {
-    switchOff('Switch2')
-  }
-}
-
-require(path.join(__dirname, 'lib', 'handle-co2sensor'))({
-  onCO2SensorRecieve,
-  io
-})
 
 // setup view engine
 app.set('view engine', 'pug')
@@ -51,29 +22,24 @@ app.set('views', path.join(__dirname, 'views'))
 const Monitor = mongoose.model('Monitor', {
   sensor: String,
   temperature: Number,
-  co2ppm: Number,
+  humidity: Number,
   timestamp: Date,
-  // battery: Number
 })
 
-async function getLast(minutes = 10){
-  let last = await Monitor.find({
-    timestamp: {$gte: moment().subtract(minutes, 'minutes')}
-  }).sort('-timestamp').exec()
-  return last.map(r => {
-    return {
-      timestamp: r.timestamp,
-      temperature: r.temperature,
-      co2ppm: r.co2ppm,
-      // battery: r.battery,
+io.on('connection', socket => {
+  socket.on('add_record', async data => {
+    const ID = data.sensor_id
+    if (VALID_SENSOR_ID_LIST.includes(ID)) {
+      let record = await Monitor.create({
+        sensor: ID,
+        temperature: data.temperature,
+        humidity: data.humidity,
+        timestamp: new Date()
+      })
+      console.log(record)
+    } else {
+      console.log('invalid token')
     }
-  }).reverse()
-}
-
-IOmonitor.on('connection', async socket => {
-  socket.emit('lastRecords', {
-    data: await getLast(5),
-    title: 'ROOM MONITOR, last 5 minutes'
   })
 })
 

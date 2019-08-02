@@ -47,7 +47,7 @@
 
 int pinDHT11 = 2;
 SimpleDHT11 dht11;
-boolean DEBUG = false;
+boolean DEBUG = true;
 byte temperature = 0;
 byte humidity = 0;
 char _version[] = "1.0";
