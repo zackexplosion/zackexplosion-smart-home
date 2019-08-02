@@ -6,7 +6,7 @@ var app = {
   env: {
     "NODE_ENV": "production",
     "DB_HOST": "localhost",
-    "PORT": 4000,
+    "PORT": 5000,
   }
 }
 
