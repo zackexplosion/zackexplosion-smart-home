@@ -1,26 +1,14 @@
-const got = require('got')
+const io = require('socket.io-client')
 
-async function test(){
-  var d1 = new Date()
-  try {
-    const response = await got('http://10.1.1.106', {
-      json: true,
-      timeout: 500
-    })
-    var d2 = new Date()
-    // console.log(response.body, 'took', d2 - d1, 'ms')
-    process.stdout.clearLine()
-    process.stdout.cursorTo(0)
-    process.stdout.write(JSON.stringify(response.body))
-    process.stdout.write(' took: ' + (d2 - d1) + 'ms')
-  }
-  catch(error) {
-    console.log(error)
-  }
+const socket = io('http://localhost:4000', {})
 
-  setTimeout( () => {
-    test()
-  }, 10)
-}
 
-test()
+socket.on('connect', () => {
+  setInterval( () => {
+    socket.emit('requestLatest')
+  }, 1000)
+
+  socket.on('responseLatest', data => {
+    console.log(data)
+  })
+})

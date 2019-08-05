@@ -19,7 +19,7 @@ require(path.join(__dirname, 'lib', 'hashpath'))(app)
 app.set('view engine', 'pug')
 app.set('views', path.join(__dirname, 'views'))
 
-const Monitor = mongoose.model('Monitor', {
+const Monitor = mongoose.model('Sensors', {
   sensor: String,
   temperature: Number,
   humidity: Number,
@@ -40,6 +40,18 @@ io.on('connection', socket => {
     } else {
       console.log('invalid token')
     }
+  })
+  // socket.emit('hello', 'hello')
+
+  socket.on('requestLatest', async () => {
+    // await Monitor.find({sensor})
+    let data = VALID_SENSOR_ID_LIST.map(async s => {
+      return Monitor.findOne({sensor: s}).sort('-timestamp')
+    })
+
+    data = await Promise.all(data)
+    // console.log(data)
+    socket.emit('responseLatest', data)
   })
 })
 
