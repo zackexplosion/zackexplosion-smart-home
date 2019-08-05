@@ -41,34 +41,34 @@ io.on('connection', socket => {
       console.log('invalid token')
     }
   })
-  // socket.emit('hello', 'hello')
 
+  let last_request = []
   socket.on('requestLatest', async () => {
-    // await Monitor.find({sensor})
-    let data = VALID_SENSOR_ID_LIST.map(async s => {
+    let data = VALID_SENSOR_ID_LIST.map(s => {
       return Monitor.findOne({sensor: s}).sort('-timestamp')
     })
 
     data = await Promise.all(data)
-    // console.log(data)
+    data.some(d => {
+      last_request = d.data
+    })
+
     socket.emit('responseLatest', data)
   })
 
   socket.on('requestHistory', async () => {
-    // await Monitor.find({sensor})
     let data = VALID_SENSOR_ID_LIST.map(async s => {
       return Monitor.find({sensor: s}).sort('-timestamp').limit(600)
     })
 
     data = await Promise.all(data)
-    // console.log(data)
     socket.emit('responseHistory', data)
   })
 })
 
-app.get('/', async function (req, res) {
-  res.render('index')
-})
+// app.get('/', async function (req, res) {
+//   res.render('index')
+// })
 
 const PORT = parseInt(process.env.PORT) || 3000
 
