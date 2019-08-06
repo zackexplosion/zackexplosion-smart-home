@@ -43,26 +43,12 @@ io.on('connection', socket => {
     }
   })
 
-  let last_request = {}
   socket.on('requestLatest', async () => {
     let data = VALID_SENSOR_ID_LIST.map(s => {
-      return Monitor.findOne({sensor: s}).sort('-timestamp').exec()
+      return Monitor.findOne({sensor: s}).sort('-date').exec()
     })
-    let sendResponse = true
     data = await Promise.all(data)
-    data.forEach(d => {
-      if (last_request[d.sensor] !== d.timestamp) {
-        last_request[d.sensor] = d.timestamp
-      }
-
-      sendResponse = false
-    })
-
-    if(sendResponse) {
-      socket.emit('responseLatest', data)
-    }
-
-
+    socket.emit('responseLatest', data)
   })
 
   socket.on('requestHistory', async () => {
@@ -74,7 +60,6 @@ io.on('connection', socket => {
     })
 
     data = await Promise.all(data)
-    // console.log(data[0])
     socket.emit('responseHistory', data)
   })
 })
