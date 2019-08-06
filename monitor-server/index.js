@@ -36,32 +36,44 @@ io.on('connection', socket => {
         humidity: data.humidity,
         timestamp: new Date()
       })
-      console.log(record)
+      io.emit('sensorUpdate', record)
     } else {
       console.log('invalid token')
     }
   })
 
-  let last_request = []
+  let last_request = {}
   socket.on('requestLatest', async () => {
     let data = VALID_SENSOR_ID_LIST.map(s => {
-      return Monitor.findOne({sensor: s}).sort('-timestamp')
+      return Monitor.findOne({sensor: s}).sort('-timestamp').exec()
     })
-
+    let sendResponse = true
     data = await Promise.all(data)
-    data.some(d => {
-      last_request = d.data
+    data.forEach(d => {
+      if (last_request[d.sensor] !== d.timestamp) {
+        last_request[d.sensor] = d.timestamp
+      }
+
+      sendResponse = false
     })
 
-    socket.emit('responseLatest', data)
+    if(sendResponse) {
+      socket.emit('responseLatest', data)
+    }
+
+
   })
 
   socket.on('requestHistory', async () => {
     let data = VALID_SENSOR_ID_LIST.map(async s => {
-      return Monitor.find({sensor: s}).sort('-timestamp').limit(600)
+      return Monitor.find({
+        sensor: s,
+        timestamp: {$gte: moment().subtract(10, 'minutes')}
+      }).sort({'date': '-1'}).exec()
     })
 
     data = await Promise.all(data)
+    // console.log(data[0])
     socket.emit('responseHistory', data)
   })
 })
