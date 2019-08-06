@@ -37,8 +37,9 @@ io.on('connection', socket => {
         timestamp: new Date()
       })
       io.emit('sensorUpdate', record)
+      console.log('sensorUpdate', record.timestamp, ID, record.temperature)
     } else {
-      console.log('invalid token')
+      console.log('invalid device')
     }
   })
 
