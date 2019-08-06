@@ -55,7 +55,7 @@ io.on('connection', socket => {
     let data = VALID_SENSOR_ID_LIST.map(async s => {
       return Monitor.find({
         sensor: s,
-        timestamp: {$gte: moment().subtract(10, 'minutes')}
+        timestamp: {$gte: moment().subtract(15, 'minutes')}
       }).sort({'date': '-1'}).exec()
     })
 
