@@ -34,19 +34,19 @@
 // const char *ssid = "";
 // const char *password = "";
 // const char *TOKEN = "";
-
+// const char *HOSTNAME = "";
 #include "settings.h"
 
 
 #include <ESP8266WiFi.h>
 //#include <WiFiClient.h>
 #include <ESP8266WebServer.h>
-//#include <ESP8266mDNS.h>
+#include <ESP8266mDNS.h>
 
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 
-#define RELAY 2 // relay connected to GPIO0
+#define RELAY 0 // relay connected to GPIO0
 #define DELAY_BETWEEN_SWITCH 2000
 
 bool isSwitchOn = false;
@@ -66,6 +66,7 @@ void switchOn() {
     digitalWrite(RELAY, LOW);
     isSwitchOn = true;
     lastSwitchChange = timeClient.getEpochTime();
+    Serial.println("Switch On complete");
   }
 }
 
@@ -105,10 +106,6 @@ void handleSwitchOff(){
 
 void renderStatus() {
   int uptime = timeClient.getEpochTime() - bootAt;
-  Serial.println(timeClient.getEpochTime());
-  Serial.println(String(bootAt));
-  Serial.println(String(uptime));
-
   server.send(200, "application/json", "{\"isSwitchOn\": " + String(isSwitchOn) + ", \"uptime\": " +  String(uptime) + ", \"version\": \"" +  String(_version) + "\"}");
 }
 
@@ -124,6 +121,7 @@ void setup(void) {
 
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
+  WiFi.hostname(HOSTNAME);
   WiFi.begin(ssid, password);
   Serial.println("");
 
@@ -144,9 +142,9 @@ void setup(void) {
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
-//  if (MDNS.begin("esp8266")) {
-//    Serial.println("MDNS responder started");
-//  }
+  if (MDNS.begin(HOSTNAME)) {
+    Serial.println("MDNS responder started");
+  }
 
   server.on("/", handleRoot);
   server.on("/on", handleSwitchOn);
