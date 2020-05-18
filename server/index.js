@@ -15,9 +15,13 @@ app.use((req, res, next) => {
 const http = require('http').Server(app)
 const io = require('socket.io')(http, { origins: '*:*'})
 
-
+var tmpData = []
 io.on('connection', socket => {
   console.log(socket.id, 'on connection')
+  socket.emit('setInitData', tmpData)
+  // socket.on('getInitData', _ => {
+  //   socket.emit('setInitData', tmpData)
+  // })
 })
 
 
@@ -27,6 +31,12 @@ async function getSensor () {
     console.log(res.data)
 
     io.emit('sensorUpdate', res.data)
+
+    tmpData.push({...res.data, timestamp: new Date().getTime()})
+
+    if(tmpData.length >= 60) {
+      tmpData.shift()
+    }
   } catch (error) {
 
   }
