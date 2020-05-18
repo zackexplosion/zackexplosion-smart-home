@@ -43,37 +43,44 @@
 #include <ESP8266WebServer.h>
 //#include <ESP8266mDNS.h>
 
+#include <NTPClient.h>
+#include <WiFiUdp.h>
+
 #define RELAY 2 // relay connected to GPIO0
 #define DELAY_BETWEEN_SWITCH 2000
 
 bool isSwitchOn = false;
 int lastSwitchChange = 0;
+int bootAt = 0;
 char _version[] = "1.0";
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, "tw.pool.ntp.org", 3600, 60000);
 ESP8266WebServer server(80);
 
 const int led = 13;
 
 
 void switchOn() {
-  if(!isSwitchOn && millis() - lastSwitchChange > DELAY_BETWEEN_SWITCH) {
+  if(!isSwitchOn && timeClient.getEpochTime() - lastSwitchChange > DELAY_BETWEEN_SWITCH) {
     Serial.println("Switch On");
     digitalWrite(RELAY, LOW);
     isSwitchOn = true;
-    lastSwitchChange = millis();
+    lastSwitchChange = timeClient.getEpochTime();
   }
 }
 
 void switchOff() {
-  if(isSwitchOn && millis() - lastSwitchChange > DELAY_BETWEEN_SWITCH) {
+  if(isSwitchOn && timeClient.getEpochTime() - lastSwitchChange > DELAY_BETWEEN_SWITCH) {
     Serial.println("Switch Off");
     digitalWrite(RELAY, HIGH);
     isSwitchOn = false;
-    lastSwitchChange = millis();
+    lastSwitchChange = timeClient.getEpochTime();
   }
 }
 
 void handleRoot() {
   digitalWrite(led, 1);
+  timeClient.update();
   renderStatus();
   digitalWrite(led, 0);
 }
@@ -97,7 +104,12 @@ void handleSwitchOff(){
 }
 
 void renderStatus() {
-  server.send(200, "application/json", "{\"isSwitchOn\": " + String(isSwitchOn) + ", \"uptime\": " +  millis() + ", \"version\": \"" +  String(_version) + "\"}");
+  int uptime = timeClient.getEpochTime() - bootAt;
+  Serial.println(timeClient.getEpochTime());
+  Serial.println(String(bootAt));
+  Serial.println(String(uptime));
+
+  server.send(200, "application/json", "{\"isSwitchOn\": " + String(isSwitchOn) + ", \"uptime\": " +  String(uptime) + ", \"version\": \"" +  String(_version) + "\"}");
 }
 
 void setup(void) {
@@ -120,6 +132,11 @@ void setup(void) {
     delay(500);
     Serial.print(".");
   }
+
+  timeClient.begin();
+  timeClient.update();
+
+  bootAt = timeClient.getEpochTime();
 
   Serial.println("");
   Serial.print(F("Connected to "));

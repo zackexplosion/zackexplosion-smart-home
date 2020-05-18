@@ -52,12 +52,14 @@ void connectToAP(char *ssid)
     if(ssid == WIFI_AP2) {
       connectToAP(WIFI_AP2);
     } else {
-      lcd.setCursor(0, 0);
-      lcd.print("cnt. failed");
-      lcd.setCursor(0, 1);
-      lcd.print("Offline mode on");
-      offline_mode = true;
+
     }
+
+    lcd.setCursor(0, 0);
+    lcd.print("cnt. failed");
+    lcd.setCursor(0, 1);
+    lcd.print("Offline mode on");
+    offline_mode = true;
   }
   show_message = false;
   delay(2000);

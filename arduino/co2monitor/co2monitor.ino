@@ -52,6 +52,8 @@ void setup() {
 
   sensor.begin(9600);
   lcd.begin(16, 2);
+
+  lcd.setRGB(255, 0, 0);
   // boot screen
   // for(int i = 16; i >= 0; i--){
   //   lcd.clear();
@@ -62,15 +64,16 @@ void setup() {
   //   delay(100);
   // }
 
-  wifiConnectionThread.setInterval(1000 * 60 * 5);
+  // wifiConnectionThread.setInterval(1000 * 60 * 5); controller.add(&wifiConnectionThread);
+  // rgbThread.setInterval(7); controller.add(&rgbThread);
   httpServerThread.setInterval(5);
   co2SensorThread.setInterval(500);
-  rgbThread.setInterval(7);
+
 
   controller.add(&httpServerThread);
-  controller.add(&wifiConnectionThread);
+ 
   controller.add(&co2SensorThread);
-  controller.add(&rgbThread);
+  
 
 }
 
