@@ -47,7 +47,7 @@
 #include <WiFiUdp.h>
 
 #define RELAY 0 // relay connected to GPIO0
-#define DELAY_BETWEEN_SWITCH 2000
+#define DELAY_BETWEEN_SWITCH 2
 
 bool isSwitchOn = false;
 int lastSwitchChange = 0;
