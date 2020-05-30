@@ -19,9 +19,6 @@ var tmpData = []
 io.on('connection', socket => {
   console.log(socket.id, 'on connection')
   socket.emit('setInitData', tmpData)
-  // socket.on('getInitData', _ => {
-  //   socket.emit('setInitData', tmpData)
-  // })
 })
 
 
@@ -38,7 +35,7 @@ async function getSensor () {
       tmpData.shift()
     }
   } catch (error) {
-
+    console.error(error)
   }
 
   setTimeout(getSensor, 5000)
