@@ -30,8 +30,8 @@ export default {
   plugins: [
     // theme
     '@/plugins/element-ui',
-    // websocket
-    '@/plugins/socket.io'
+    // etc...
+    '@/plugins/utils'
   ],
   /*
    ** Nuxt.js dev-modules

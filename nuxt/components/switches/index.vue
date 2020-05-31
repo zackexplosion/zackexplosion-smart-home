@@ -8,9 +8,13 @@
       label="Name"
     />
     <el-table-column
-      prop="uptime"
       label="Uptime"
-    />
+    >
+      <template slot-scope="scope">
+        {{ scope.row.uptime | humanizeDurationSeconds }},
+        {{ scope.row.uptime }}
+      </template>
+    </el-table-column>
     <el-table-column
       label="status"
     >
@@ -25,6 +29,7 @@
 </template>
 
 <script>
+
 export default {
   data() {
     return {
@@ -39,6 +44,10 @@ export default {
   },
   mounted() {
     this.$socket.on('setInitData', (data) => {
+      this.switches = data.switchesStatus
+    })
+
+    this.$socket.on('updateStatus', (data) => {
       this.switches = data.switchesStatus
     })
   },

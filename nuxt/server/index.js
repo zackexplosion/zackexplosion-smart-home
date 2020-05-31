@@ -76,15 +76,14 @@ const SWITCHES = [
   })
 ]
 
-io.on('connection', async(socket) => {
-  console.log(socket.id, 'on connection')
+async function getSwitchesStatus() {
   var switchesStatus = []
   try {
-    const switches = await Promise.all(SWITCHES.map(s => {
+    const promises = await Promise.all(SWITCHES.map(s => {
       return request(s.api)
     }))
 
-    switches.forEach((s, index) => {
+    promises.forEach((s, index) => {
       switchesStatus.push({
         name: SWITCHES[index].name,
         uptime: s.data.uptime,
@@ -94,23 +93,46 @@ io.on('connection', async(socket) => {
   } catch (error) {
     console.error(error)
   }
-  initData.switchesStatus = switchesStatus
+
+  return switchesStatus
+}
+
+io.on('connection', async(socket) => {
+  console.log(socket.id, 'on connection')
+  try {
+    initData.switchesStatus = await getSwitchesStatus()
+  } catch (error) {
+    initData.switchesStatus = []
+  }
+
   socket.emit('setInitData', initData)
 
   socket.on('changeSwitchStatus', _switch => {
-    console.log('switch', _switch)
-    const __switch = SWITCHES.find(_ => {
+    const s = SWITCHES.find(_ => {
       return _.name === _switch.name
     })
 
-    if (!__switch) return
-
-    if (_switch.status) {
-      __switch.on()
-    } else {
-      __switch.off()
-    }
+    if (!s) return
+    // switch on/off
+    (_switch.status) ? s.on() : s.off()
   })
-})
+});
+
+(async function switchesStatusRunner() {
+  var status = {
+    switchesStatus: []
+  }
+  try {
+    const s = await getSwitchesStatus()
+    status.switchesStatus = s
+    io.emit('updateStatus', status)
+  } catch (error) {
+    console.error(error)
+  }
+
+  setTimeout(() => {
+    switchesStatusRunner()
+  }, 1000)
+})()
 
 start()

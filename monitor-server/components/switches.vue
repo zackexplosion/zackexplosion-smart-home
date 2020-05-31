@@ -43,7 +43,7 @@
 </template>
 
 <script>
-const humanizeDuration = require('humanize-duration')
+
 const socket = io('/switch')
 export default {
   data() {
