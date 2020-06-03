@@ -44,20 +44,7 @@ export default {
           enabled: true,
           enabledOnSeries: [1]
         },
-        labels: [
-          '01 Jan 2001',
-          '02 Jan 2001',
-          '03 Jan 2001',
-          '04 Jan 2001',
-          '05 Jan 2001',
-          '06 Jan 2001',
-          '07 Jan 2001',
-          '08 Jan 2001',
-          '09 Jan 2001',
-          '10 Jan 2001',
-          '11 Jan 2001',
-          '12 Jan 2001'
-        ],
+        labels: [],
         xaxis: {
           type: 'datetime'
         },
@@ -75,33 +62,6 @@ export default {
           }
         ]
       },
-      options: {
-        chart: {
-          animations: {
-            enabled: true,
-            easing: 'linear',
-            dynamicAnimation: {
-              speed: 1000
-            }
-          },
-          toolbar: {
-            show: false
-          },
-          zoom: {
-            enabled: false
-          }
-        },
-        xaxis: {
-          type: 'datetime',
-          range: 777600000
-        },
-        yaxis: {
-          max: 100
-        }
-        // xaxis: {
-        //   categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998]
-        // }
-      },
       series2: [
         {
           name: 'Website Blog',
@@ -113,8 +73,7 @@ export default {
           type: 'line',
           data: []
         }
-      ],
-      series: []
+      ]
     }
   },
   watch: {
@@ -123,20 +82,39 @@ export default {
       handler(newValue, oldValue) {
         var hData = []
         var tData = []
+        var labels = []
         newValue.forEach(n => {
-          hData.push(n.temprature)
-          tData.push(n.humidity)
+          // debugger
+          // hData.push(n.temprature)
+          const y = n.timestamp / 1000
+          hData.push({
+            x: n.temperature,
+            y
+          })
+          tData.push({
+            x: n.humidity,
+            y
+          })
+          labels.push(n.timestamp)
         })
-        // this.$refs.chart.updateSeries([{
-        //   name: 'Website Blog',
-        //   type: 'column',
-        //   data: hData
-        // },
-        // {
-        //   name: 'Social Media',
-        //   type: 'line',
-        //   data: tData
-        // }])
+
+        this.$refs.chart.updateOptions({
+          ...this.options2.chart
+          // labels
+        })
+        const d = [{
+          name: 'Website Blog',
+          type: 'column',
+          data: hData
+        },
+        {
+          name: 'Social Media',
+          type: 'line',
+          data: tData
+        }]
+
+        // console.log(d)
+        this.$refs.chart.updateSeries(d)
       }
     }
   }

@@ -1,7 +1,8 @@
 <template>
   <div class="container">
-    <Charts />
+    <h1>Wryyyyy</h1>
     <Switches />
+    <Charts />
   </div>
 </template>
 

@@ -7,6 +7,10 @@ const request = require('axios')
 // const moment = require('moment')
 const io = require('socket.io')(http, { origins: '*:*' })
 const { loadNuxt, build } = require('nuxt')
+const { SWITCHES, SENSORS } = require('./config')
+const events = require('events')
+const em = new events.EventEmitter()
+
 async function start() {
   // We get Nuxt instance
   const nuxt = await loadNuxt(isDev ? 'dev' : 'start')
@@ -21,60 +25,64 @@ async function start() {
   // Listen the server
   http.listen(port, '0.0.0.0')
   console.log('Server listening on `localhost:' + port + '`.')
-
-  getSensor()
 }
 const initData = {
-  bathroom: []
+  sensors: {}
 }
-async function getSensor() {
+SENSORS.forEach(s => {
+  initData['sensors'][s.name] = []
+});
+
+(async function readSensorsRunner() {
+  var dataToUpdate = {}
+  var sensorsData = []
   try {
-    const res = await request('http://10.1.1.3/?token=YEEEEEEE')
-    const data = {
-      ...res.data, timestamp: new Date().getTime()
-    }
-
-    io.emit('sensorUpdate', {
-      bathroom: data
-    })
-
-    initData.bathroom.push(data)
-
-    if (initData.length >= 60) {
-      initData.shift()
-    }
+    sensorsData = await readSensors()
   } catch (error) {
     console.error(error)
   }
 
-  setTimeout(getSensor, 5000)
-}
-
-class WifiSwitch {
-  constructor(options) {
-    this.name = options.name
-    this.api = options.api
-    this.token = options.token
-  }
-
-  on() {
-    const url = `${this.api}/on?token=${this.token}`
-    return request(url)
-  }
-
-  off() {
-    const url = `${this.api}/off?token=${this.token}`
-    return request(url)
-  }
-}
-
-const SWITCHES = [
-  new WifiSwitch({
-    name: 'inputFan',
-    api: 'http://10.1.1.28',
-    token: 'YEEEEEEE'
+  sensorsData.forEach(d => {
+    if (initData['sensors'][d.name].length > 60) {
+      initData['sensors'][d.name].shift()
+    }
+    initData['sensors'][d.name].push(d)
   })
-]
+
+  sensorsData.forEach(s => {
+    dataToUpdate[s.name] = s
+  })
+
+  if (Object.keys(dataToUpdate).length > 0) {
+    io.emit('updateSensor', dataToUpdate)
+    em.emit('updateSensor', dataToUpdate)
+  }
+
+  setTimeout(readSensorsRunner, 5000)
+})()
+
+async function readSensors() {
+  var results = []
+  try {
+    results = await Promise.all(SENSORS.map(s => {
+      var url = s.api
+      if (s.token) {
+        url = url + `?token=${s.token}`
+      }
+      return request(url).then(res => {
+        return {
+          ...res.data,
+          name: s.name,
+          timestamp: new Date().getTime()
+        }
+      })
+    }))
+  } catch (error) {
+    // console.error(error)
+  }
+
+  return results
+}
 
 async function getSwitchesStatus() {
   var switchesStatus = []
@@ -97,27 +105,6 @@ async function getSwitchesStatus() {
   return switchesStatus
 }
 
-io.on('connection', async(socket) => {
-  console.log(socket.id, 'on connection')
-  try {
-    initData.switchesStatus = await getSwitchesStatus()
-  } catch (error) {
-    initData.switchesStatus = []
-  }
-
-  socket.emit('setInitData', initData)
-
-  socket.on('changeSwitchStatus', _switch => {
-    const s = SWITCHES.find(_ => {
-      return _.name === _switch.name
-    })
-
-    if (!s) return
-    // switch on/off
-    (_switch.status) ? s.on() : s.off()
-  })
-});
-
 (async function switchesStatusRunner() {
   var status = {
     switchesStatus: []
@@ -134,5 +121,44 @@ io.on('connection', async(socket) => {
     switchesStatusRunner()
   }, 1000)
 })()
+
+em.on('updateSensor', function(data) {
+  const bData = data['room-co2']
+  const {
+    co2ppm,
+    temperature
+  } = bData
+  const s = SWITCHES.find(_ => _.name === 'inputFan')
+  if (!s) return false
+
+  if (co2ppm > 700 && temperature < 30 && !s.status) {
+    s.on()
+  } else if (co2ppm < 500 && s.status) {
+    s.off()
+  }
+})
+
+io.on('connection', async(socket) => {
+  // console.log(socket.id, 'on connection')
+  try {
+    initData['switchesStatus'] = await getSwitchesStatus()
+  } catch (error) {
+    initData['switchesStatus'] = []
+  }
+
+  console.log('seding init data', initData)
+
+  socket.emit('setInitData', initData)
+
+  socket.on('changeSwitchStatus', _switch => {
+    const s = SWITCHES.find(_ => {
+      return _.name === _switch.name
+    })
+
+    if (!s) return
+    // switch on/off
+    (_switch.status) ? s.on() : s.off()
+  })
+})
 
 start()

@@ -7,9 +7,7 @@
       prop="name"
       label="Name"
     />
-    <el-table-column
-      label="Uptime"
-    >
+    <el-table-column label="Uptime">
       <template slot-scope="scope">
         {{ scope.row.uptime | humanizeDurationSeconds }},
         {{ scope.row.uptime }}
