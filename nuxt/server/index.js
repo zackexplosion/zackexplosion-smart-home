@@ -38,6 +38,7 @@ SENSORS.forEach(s => {
   var sensorsData = []
   try {
     sensorsData = await readSensors()
+    console.log('sensorsData', sensorsData)
   } catch (error) {
     console.error(error)
   }
@@ -64,21 +65,24 @@ SENSORS.forEach(s => {
 async function readSensors() {
   var results = []
   try {
-    results = await Promise.all(SENSORS.map(s => {
+    await Promise.all(SENSORS.map(s => {
       var url = s.api
       if (s.token) {
         url = url + `?token=${s.token}`
       }
-      return request(url).then(res => {
-        return {
+      return request({
+        url,
+        timeout: 1000
+      }).then(res => {
+        results.push({
           ...res.data,
           name: s.name,
           timestamp: new Date().getTime()
-        }
+        })
       })
     }))
   } catch (error) {
-    // console.error(error)
+    console.error(error.address, error.code)
   }
 
   return results
@@ -123,23 +127,24 @@ async function getSwitchesStatus() {
 })()
 
 em.on('updateSensor', function(data) {
+  // console.log(data)
   const bData = data['room-co2']
+  const oData = data['outdoor-TH']
+  if (!bData || !oData) return539
   const {
-    co2ppm,
-    temperature
+    co2ppm
   } = bData
   const s = SWITCHES.find(_ => _.name === 'inputFan')
   if (!s) return false
 
-  if (co2ppm > 700 && temperature < 30 && !s.status) {
+  if (co2ppm > 700 && oData.temperature < 30 && !s.status) {
     s.on()
-  } else if (co2ppm < 500 && s.status) {
+  } else if (co2ppm < 550 && s.status) {
     s.off()
   }
 })
 
 io.on('connection', async(socket) => {
-  // console.log(socket.id, 'on connection')
   try {
     initData['switchesStatus'] = await getSwitchesStatus()
   } catch (error) {
