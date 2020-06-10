@@ -4,8 +4,9 @@ FROM mhart/alpine-node:12
 WORKDIR /app
 
 # Install app dependencies
-COPY package.json package-lock.json /app/
+COPY package.json /app/
 RUN npm install
+RUN npm install -g nodemon
 
 # Bundle app source
 COPY . /app
