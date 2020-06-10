@@ -1,13 +1,11 @@
 # Base image
-FROM node:13.1
+FROM mhart/alpine-node:12
 # Create app directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Install app dependencies
-COPY package.json package-lock.json /usr/src/app/
+COPY package.json package-lock.json /app/
 RUN npm install
 
 # Bundle app source
-COPY . /usr/src/app
-ENV NODE_ENV='development'
-RUN npm run dev
+COPY . /app
