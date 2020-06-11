@@ -1,11 +1,12 @@
 # Base image
-FROM node:10.16
+FROM mhart/alpine-node:12.18.0
 # Create app directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Install app dependencies
-COPY package.json yarn.lock /usr/src/app/
-RUN yarn install && yarn cache clean
+COPY package.json /app/
+RUN npm install
+RUN npm install -g nodemon
 
 # Bundle app source
-COPY . /usr/src/app
+COPY . /app
