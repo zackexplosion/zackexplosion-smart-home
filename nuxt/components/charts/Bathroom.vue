@@ -102,19 +102,19 @@ export default {
           ...this.options2.chart
           // labels
         })
-        const d = [{
-          name: 'Website Blog',
-          type: 'column',
-          data: hData
-        },
-        {
-          name: 'Social Media',
-          type: 'line',
-          data: tData
-        }]
+        // const d = [{
+        //   name: 'Website Blog',
+        //   type: 'column',
+        //   data: hData
+        // },
+        // {
+        //   name: 'Social Media',
+        //   type: 'line',
+        //   data: tData
+        // }]
 
         // console.log(d)
-        this.$refs.chart.updateSeries(d)
+        // this.$refs.chart.updateSeries(d)
       }
     }
   }

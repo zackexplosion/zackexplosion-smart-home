@@ -1,5 +1,5 @@
 # Base image
-FROM mhart/alpine-node:12
+FROM mhart/alpine-node:12.18.0
 # Create app directory
 WORKDIR /app
 

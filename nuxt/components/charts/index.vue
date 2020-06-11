@@ -25,7 +25,7 @@ export default {
       this.bathroomThChartData = data
     })
 
-    this.$socket.on('updateSensor', (data) => {
+    this.$socket.on('updateSensors', (data) => {
       const d = data[dataKey]
       if (this.bathroomThChartData.length > 100) {
         this.bathroomThChartData.shift()

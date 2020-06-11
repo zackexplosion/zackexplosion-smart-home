@@ -1,29 +1,35 @@
 <template>
-  <el-table
-    :data="switches"
-    style="width: 100%"
-  >
-    <el-table-column
-      prop="name"
-      label="Name"
-    />
-    <el-table-column label="Uptime">
-      <template slot-scope="scope">
-        {{ scope.row.uptime | humanizeDurationSeconds }},
-        {{ scope.row.uptime }}
-      </template>
-    </el-table-column>
-    <el-table-column
-      label="status"
+  <section>
+    <h2>Switches</h2>
+    <el-table
+      :data="switches"
+      style="width: 100%"
     >
-      <template slot-scope="scope">
-        <el-switch
-          v-model="scope.row.status"
-          @change="handleSwitchChange(scope.row)"
-        />
-      </template>
-    </el-table-column>
-  </el-table>
+      <el-table-column
+        prop="name"
+        label="Name"
+        width="150"
+      />
+      <el-table-column
+        label="Uptime"
+        width="350"
+      >
+        <template slot-scope="scope">
+          {{ scope.row.uptime | humanizeDurationSeconds }}
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="status"
+      >
+        <template slot-scope="scope">
+          <el-switch
+            v-model="scope.row.status"
+            @change="handleSwitchChange(scope.row)"
+          />
+        </template>
+      </el-table-column>
+    </el-table>
+  </section>
 </template>
 
 <script>
@@ -45,7 +51,7 @@ export default {
       this.switches = data.switchesStatus
     })
 
-    this.$socket.on('updateStatus', (data) => {
+    this.$socket.on('updateSwitchStatus', (data) => {
       this.switches = data.switchesStatus
     })
   },
