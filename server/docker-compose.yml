@@ -4,25 +4,12 @@ services:
   #   image: "redis:alpine"
   #   ports:
   #     - "6379:6379"
-  # db:
-  #   image: "mysql:5.7.13"
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: 1qazXSW@
-  #     MYSQL_DATABASE: courcasa_membership
-  #   volumes:
-  #     - ~/db:/var/lib/mysql
-  #     - ./docker_configs/my.cnf:/etc/mysql/my.cnf
-  #   ports:
-  #     - "3306:3306"
-  mariadb:
-    image: mariadb:10.2
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
+  db:
+    image: "mongo:3-stretch"
+    volumes:
+      - ${DB_PATH}:/data/db
     ports:
-      - "3306:3306"
-      # MYSQL_USER: mybb
-      # MYSQL_PASSWORD: changeme
+      - 27017:27017
   app:
     stdin_open: true
     tty: true
@@ -37,7 +24,7 @@ services:
       PORT: 4000
       NODE_ENV: development
     depends_on:
-      - mariadb
+      - db
       # - redis
     logging:
       driver: json-file

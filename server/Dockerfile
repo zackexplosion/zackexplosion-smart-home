@@ -4,9 +4,10 @@ FROM mhart/alpine-node:12.18.0
 WORKDIR /app
 
 # Install app dependencies
-COPY package.json /app/
-RUN npm install
-RUN npm install -g nodemon
+# COPY package.json /app/
+
 
 # Bundle app source
 COPY . /app
+RUN npm install
+RUN npm install -g nodemon

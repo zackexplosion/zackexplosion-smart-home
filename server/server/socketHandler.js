@@ -62,7 +62,7 @@ async function getSwitchesStatus() {
   return switchesStatus
 }
 
-module.exports = (em, io) => {
+module.exports = (em, io, db) => {
   (async function getSensorsStatusRunner() {
     var dataToUpdate = {}
     var sensorsData = []

@@ -10,7 +10,6 @@ const { loadNuxt, build } = require('nuxt')
 const events = require('events')
 const em = new events.EventEmitter()
 require('./rules')(em)
-require('./socketHandler')(em, io)
 
 async function start() {
   // We get Nuxt instance
@@ -23,6 +22,9 @@ async function start() {
   if (isDev) {
     build(nuxt)
   }
+  // waiting for database
+  const db = await require('./db')
+  require('./socketHandler')(em, io, db)
   // Listen the server
   http.listen(port, '0.0.0.0')
   console.log('Server listening on `localhost:' + port + '`.')
