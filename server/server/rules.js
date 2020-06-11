@@ -29,11 +29,12 @@ module.exports = (em) => {
   // handle output fan
   em.on('updateSensors', function(data) {
     const bathroomData = data['bathroom-TH']
-    if (!bathroomData) return
+    const outdoorData = data['outdoor-TH']
+    if (!bathroomData || !outdoorData) return
 
     const s = SWITCHES.find(_ => _.name === 'outputFan')
 
-    if (bathroomData.humidity > 70) {
+    if (bathroomData.humidity > 70 || bathroomData.temperature > outdoorData.temperature) {
       s.on()
     } else {
       s.off()

@@ -40,7 +40,8 @@ export default {
   data() {
     return {
       sensors: {},
-      countSensorsUptimeInterval: null
+      countSensorsUptimeInterval: null,
+      sensorsUptimeInterval: 1000
     }
   },
   computed: {
@@ -72,10 +73,20 @@ export default {
         this.sensors[k] = { ...sensors[k] }
       })
     })
+
+    this.countSensorsUptimeInterval = setInterval(() => {
+      this.countSensorsUptime()
+    }, this.sensorsUptimeInterval)
   },
   methods: {
     countSensorsUptime() {
-      setInterval
+      this.sensors = Object.assign({}, {}, this.sensors)
+      Object.keys(this.sensors).forEach(k => {
+        var uptime = this.sensors[k].uptime + this.sensorsUptimeInterval
+        this.sensors[k] = Object.assign({}, this.sensors[k], {
+          uptime
+        })
+      })
     }
   }
 }
