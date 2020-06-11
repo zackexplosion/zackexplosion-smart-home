@@ -14,9 +14,13 @@ const SensorsLog = mongoose.model('SensorsLog', {
 var models = {
   SensorsLog
 }
+
+// mongoose.set('debug', true)
+
 module.exports = new Promise((resolve, reject) => {
   console.log('create new db connection')
   mongoose.connect(`mongodb://${DB_HOST}:${DB_PORT}/room-monitor`, {
+    useUnifiedTopology: true,
     useNewUrlParser: true,
     reconnectTries: Number.MAX_VALUE
   }).then(() => {

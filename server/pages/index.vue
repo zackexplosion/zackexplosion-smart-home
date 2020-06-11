@@ -2,19 +2,19 @@
   <div class="container">
     <Switches />
     <Sensors />
-    <Charts />
+    <!-- <Charts /> -->
   </div>
 </template>
 
 <script>
-import Charts from '~/components/charts'
+// import Charts from '~/components/charts'
 import Sensors from '~/components/sensors'
 import Switches from '~/components/switches'
 export default {
   components: {
     Switches,
-    Sensors,
-    Charts
+    Sensors
+    // Charts
   }
 }
 </script>

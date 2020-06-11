@@ -1,8 +1,8 @@
 <template>
-  <Bathroom :data="bathroomThChartData" />
+  <!-- <Bathroom :data="bathroomThChartData" /> -->
+  <div></div>
 </template>
 <script>
-import Bathroom from './Bathroom.vue'
 const dataKey = 'bathroom-TH'
 
 function getData(data) {
@@ -10,7 +10,7 @@ function getData(data) {
 }
 export default {
   components: {
-    Bathroom
+    // Bathroom
   },
   data() {
     return {

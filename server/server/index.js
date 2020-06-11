@@ -23,8 +23,7 @@ async function start() {
     build(nuxt)
   }
   // waiting for database
-  // const db = await require('./db')
-  const db = {}
+  const db = await require('./db')
   require('./socketHandler')(em, io, db)
   // Listen the server
   http.listen(port, '0.0.0.0')

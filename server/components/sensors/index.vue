@@ -56,15 +56,13 @@ export default {
   },
   mounted() {
     this.$socket.on('setInitData', (data) => {
-      const { sensors } = data
-      if (!sensors) return
+      const { sensorsStatus } = data
+      if (!sensorsStatus) return
 
       this.sensors = {}
-      for (var key in sensors) {
-        const _ = sensors[key]
-        const s = _[_.length - 1]
-        this.sensors[key] = s
-      }
+      sensorsStatus.forEach(s => {
+        this.sensors[s.name] = s
+      })
     })
 
     this.$socket.on('updateSensors', (sensors) => {

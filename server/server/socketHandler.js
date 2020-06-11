@@ -4,9 +4,7 @@ const { SWITCHES, SENSORS } = require('./config')
 const initData = {
   sensors: {}
 }
-SENSORS.forEach(s => {
-  initData['sensors'][s.name] = []
-})
+
 
 async function getSensorsStatus() {
   var results = []
@@ -62,7 +60,24 @@ async function getSwitchesStatus() {
   return switchesStatus
 }
 
-module.exports = (em, io, db) => {
+module.exports = async (em, io, db) => {
+  // setup sensors initdata
+  // SENSORS.forEach(async s => {
+  //   initData['sensors'][s.name] = await db.SensorsLog.find({name: s.name}).limit(100).exec()
+  // })
+  try {
+    for (let i in SENSORS) {
+      const s  = SENSORS[i]
+      const data = await db.SensorsLog.find({name: s.name}).limit(100).exec()
+
+      initData['sensors'][s.name] = data
+    }
+    console.log('initData', initData)
+  } catch (error) {
+    console.error(error)
+  }
+
+
   (async function getSensorsStatusRunner() {
     var dataToUpdate = {}
     var sensorsData = []
@@ -72,8 +87,25 @@ module.exports = (em, io, db) => {
       console.error(error)
     }
 
+    var saveDataPromises = []
+    for(var i in sensorsData){
+      const d = sensorsData[i]
+
+      const s = db.SensorsLog.create({
+        name: d.name,
+        temperature: d.temperature || 0,
+        humidity: d.humidity || 0,
+        co2ppm: d.co2ppm || 0,
+        timestamp: new Date()
+      })
+      saveDataPromises.push(s)
+    }
+
+    await Promise.all(saveDataPromises)
+    // console.log(dd)
+
     sensorsData.forEach(d => {
-      if (initData['sensors'][d.name].length > 60) {
+      if (initData['sensors'][d.name].length > 100) {
         initData['sensors'][d.name].shift()
       }
       initData['sensors'][d.name].push(d)
@@ -111,6 +143,7 @@ module.exports = (em, io, db) => {
   io.on('connection', async(socket) => {
     try {
       initData['switchesStatus'] = await getSwitchesStatus()
+      initData['sensorsStatus'] = await getSensorsStatus()
     } catch (error) {
       initData['switchesStatus'] = []
     }
