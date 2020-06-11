@@ -20,3 +20,7 @@ Vue.filter('humanizeDuration', function(value) {
 import io from 'socket.io-client'
 
 Vue.prototype.$socket = io('/')
+
+import HighchartsVue from 'highcharts-vue'
+
+Vue.use(HighchartsVue)

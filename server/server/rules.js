@@ -34,7 +34,7 @@ module.exports = (em) => {
 
     const s = SWITCHES.find(_ => _.name === 'outputFan')
 
-    if (bathroomData.humidity > 70 || bathroomData.temperature > outdoorData.temperature) {
+    if (bathroomData.humidity > 70) {
       s.on()
     } else {
       s.off()

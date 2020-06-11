@@ -1,14 +1,28 @@
 <template>
-  <apexchart
-    ref="chart"
-    type="line"
-    :options="options2"
-    :series="series2"
-  />
+  <el-row>
+    <el-col :md="12">
+      <apexchart
+        ref="temperature_chart"
+        type="line"
+        :options="temperature_options"
+        :series="t_series"
+      />
+    </el-col>
+    <el-col :md="12">
+      <apexchart
+        ref="humidity_chart"
+        type="line"
+        :options="humidity_options"
+        :series="h_series"
+      />
+    </el-col>
+  </el-row>
+
 </template>
 
 <script>
 import apexchart from 'vue-apexcharts'
+import { createOptions } from './utils'
 export default {
   components: {
     apexchart
@@ -23,53 +37,24 @@ export default {
   },
   data() {
     return {
-      options2: {
-        chart: {
-          height: 350,
+      temperature_options: createOptions({
+        title: 'Bathroom temperature',
+        ymax: 50
+      }),
+      humidity_options: createOptions({
+        title: 'Bathroom humidity',
+        ymax: 100
+      }),
+      t_series: [
+        {
+          name: '溫度',
           type: 'line',
-          toolbar: {
-            show: false
-          },
-          zoom: {
-            enabled: false
-          }
-        },
-        stroke: {
-          width: [0, 4]
-        },
-        title: {
-          text: 'Traffic Sources'
-        },
-        dataLabels: {
-          enabled: true,
-          enabledOnSeries: [1]
-        },
-        labels: [],
-        xaxis: {
-          type: 'datetime'
-        },
-        yaxis: [
-          {
-            title: {
-              text: 'Website Blog'
-            }
-          },
-          {
-            opposite: true,
-            title: {
-              text: 'Social Media'
-            }
-          }
-        ]
-      },
-      series2: [
-        {
-          name: 'Website Blog',
-          type: 'column',
           data: []
-        },
+        }
+      ],
+      h_series: [
         {
-          name: 'Social Media',
+          name: '濕度',
           type: 'line',
           data: []
         }
@@ -80,41 +65,27 @@ export default {
     data: {
       deep: true,
       handler(newValue, oldValue) {
-        var hData = []
-        var tData = []
-        var labels = []
+        var t_series_data = []
+        var h_series_data = []
         newValue.forEach(n => {
-          // debugger
-          // hData.push(n.temprature)
-          const y = n.timestamp / 1000
-          hData.push({
-            x: n.temperature,
-            y
+          t_series_data.push({
+            x: n.timestamp,
+            y: n.temperature
           })
-          tData.push({
-            x: n.humidity,
-            y
+
+          h_series_data.push({
+            x: n.timestamp,
+            y: n.humidity
           })
-          labels.push(n.timestamp)
         })
 
-        this.$refs.chart.updateOptions({
-          ...this.options2.chart
-          // labels
-        })
-        // const d = [{
-        //   name: 'Website Blog',
-        //   type: 'column',
-        //   data: hData
-        // },
-        // {
-        //   name: 'Social Media',
-        //   type: 'line',
-        //   data: tData
-        // }]
+        this.$refs.temperature_chart.updateSeries([{
+          data: t_series_data
+        }], false, true)
 
-        // console.log(d)
-        // this.$refs.chart.updateSeries(d)
+        this.$refs.humidity_chart.updateSeries([{
+          data: h_series_data
+        }], false, true)
       }
     }
   }

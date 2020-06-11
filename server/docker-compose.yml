@@ -14,6 +14,15 @@ services:
   #     - ./docker_configs/my.cnf:/etc/mysql/my.cnf
   #   ports:
   #     - "3306:3306"
+  mariadb:
+    image: mariadb:10.2
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    ports:
+      - "3306:3306"
+      # MYSQL_USER: mybb
+      # MYSQL_PASSWORD: changeme
   app:
     stdin_open: true
     tty: true
@@ -27,8 +36,8 @@ services:
     environment:
       PORT: 4000
       NODE_ENV: development
-    # depends_on:
+    depends_on:
+      - mariadb
       # - redis
-      # - db
     logging:
       driver: json-file
