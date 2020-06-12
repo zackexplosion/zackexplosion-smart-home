@@ -12,7 +12,7 @@
       />
       <el-table-column
         label="Uptime"
-        width="350"
+        width="250"
       >
         <template slot-scope="scope">
           {{ scope.row.uptime | humanizeDurationSeconds }}
@@ -28,6 +28,10 @@
           />
         </template>
       </el-table-column>
+      <el-table-column
+        prop=""
+        label=""
+      />
     </el-table>
   </section>
 </template>

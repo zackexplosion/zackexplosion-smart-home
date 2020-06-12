@@ -23,4 +23,16 @@ Vue.prototype.$socket = io('/')
 
 import HighchartsVue from 'highcharts-vue'
 
+import Highcharts from 'highcharts'
+import stockInit from 'highcharts/modules/stock'
+
+const timezone = new Date().getTimezoneOffset()
+
+Highcharts.setOptions({
+  global: {
+    timezoneOffset: timezone
+  }
+})
+stockInit(Highcharts)
+
 Vue.use(HighchartsVue)

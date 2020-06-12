@@ -4,6 +4,9 @@ export default {
    ** Headers of the page
    */
   head: {
+    script: [
+      { src: '//code.highcharts.com/stock/highstock.js' }
+    ],
     title: 'Zackepxlosion Home Environment Monitor',
     meta: [
       { charset: 'utf-8' },

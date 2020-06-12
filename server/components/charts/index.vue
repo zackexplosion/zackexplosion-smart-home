@@ -1,41 +1,32 @@
 <template>
-  <!-- <Bathroom :data="bathroomThChartData" /> -->
-  <div></div>
+  <div>
+    <Chart
+      title="room-temperature"
+      sensor-key="room-co2"
+      data-name="temperature"
+      :data-key="1"
+    />
+    <Chart
+      title="room-co2"
+      sensor-key="room-co2"
+      data-name="co2ppm"
+      :data-key="2"
+    />
+  </div>
 </template>
 <script>
-const dataKey = 'bathroom-TH'
-
-function getData(data) {
-  return data['sensors'][dataKey]
-}
+import Chart from './chartCreator'
 export default {
   components: {
-    // Bathroom
+    Chart
   },
   data() {
     return {
-      bathroomThChartData: []
+
     }
   },
   mounted() {
-    this.$socket.on('setInitData', _ => {
-      // console.log('setInitData', data)
-      const data = getData(_)
-      // console.log(data)
-      this.bathroomThChartData = data
-    })
 
-    this.$socket.on('updateSensors', (data) => {
-      const d = data[dataKey]
-      if (this.bathroomThChartData.length > 100) {
-        this.bathroomThChartData.shift()
-      }
-      this.bathroomThChartData.push({
-        temperature: d.temperature,
-        humidity: d.humidity,
-        timestamp: d.timestamp
-      })
-    })
   }
 }
 </script>

@@ -12,7 +12,7 @@
       />
       <el-table-column
         label="Uptime"
-        width="350"
+        width="250"
       >
         <template slot-scope="scope">
           {{ scope.row.uptime | humanizeDuration }}
@@ -21,14 +21,21 @@
       <el-table-column
         prop="temperature"
         label="溫度"
+        width="100"
       />
       <el-table-column
         prop="humidity"
         label="濕度"
+        width="100"
       />
       <el-table-column
         prop="co2ppm"
         label="CO2ppm"
+        width="100"
+      />
+      <el-table-column
+        prop=""
+        label=""
       />
     </el-table>
   </section>
