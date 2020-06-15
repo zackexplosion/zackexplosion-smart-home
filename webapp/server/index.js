@@ -24,7 +24,9 @@ async function start() {
   }
   // waiting for database
   const db = await require('./db')
-  require('./socketHandler')(em, io, db)
+  require('./socketHandler')({ em, io, db })
+  require('./runners/getSensorsStatusRunner')({ em, io, db })
+  require('./runners/getSwitchesStatusRunner')({ em, io, db })
   // Listen the server
   http.listen(port, '0.0.0.0')
   console.log('Server listening on `localhost:' + port + '`.')

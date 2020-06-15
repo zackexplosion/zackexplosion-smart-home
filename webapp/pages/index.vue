@@ -1,10 +1,10 @@
 <template>
   <el-row class="container">
-    <el-col>
+    <el-col :md="12">
       <Sensors />
       <Switches />
     </el-col>
-    <el-col>
+    <el-col :md="12">
       <Charts />
     </el-col>
   </el-row>
@@ -24,8 +24,8 @@ export default {
 </script>
 
 <style scoped>
-.container {
+/* .container {
   max-width: 1024px;
   margin:0 auto;
-}
+} */
 </style>
