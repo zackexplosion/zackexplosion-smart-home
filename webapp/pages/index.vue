@@ -1,9 +1,13 @@
 <template>
-  <div class="container">
-    <Charts />
-    <Sensors />
-    <Switches />
-  </div>
+  <el-row class="container">
+    <el-col>
+      <Sensors />
+      <Switches />
+    </el-col>
+    <el-col>
+      <Charts />
+    </el-col>
+  </el-row>
 </template>
 
 <script>
