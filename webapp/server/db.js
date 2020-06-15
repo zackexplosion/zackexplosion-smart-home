@@ -3,16 +3,21 @@ const DB_PORT = process.env.DB_PORT || 27017
 
 const mongoose = require('mongoose')
 
-const SensorsLog = mongoose.model('SensorsLog', {
+const SensorsLogSchema = new mongoose.Schema({
   name: String,
   temperature: Number,
   humidity: Number,
   co2ppm: Number,
-  timestamp: Date
+  timestamp: {
+    type: Date,
+    get: function(t) {
+      return t.getTime()
+    }
+  }
 })
 
 var models = {
-  SensorsLog
+  SensorsLog: mongoose.model('SensorsLog', SensorsLogSchema)
 }
 
 // mongoose.set('debug', true)

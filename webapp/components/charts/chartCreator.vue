@@ -41,13 +41,15 @@ export default {
         return
       }
 
+      var initData = data.map(c => {
+        return [c[0], c[this.dataKey]]
+      })
+
       this.chart = createChart({
         title: this.title,
         renderTo: this.renderTo,
         dataName: this.dataName || this.title,
-        initData: data.map(c => {
-          return [c[0], c[this.dataKey]]
-        })
+        initData
       })
     })
 

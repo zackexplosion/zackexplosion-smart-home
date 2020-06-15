@@ -17,10 +17,10 @@ module.exports = (em) => {
     // console.log('co2ppm', co2ppm)
     // console.log('oData.temperature', oData.temperature)
 
-    if (lastCO2ppm >= co2ppm && oData.temperature <= 30 && !s.status) {
+    if (co2ppm >= 800 && oData.temperature <= 30 && !s.status) {
       s.on()
-    } else if (co2ppm < 500 && s.status) {
-      s.off()
+    } else if (co2ppm < 650 && s.status) {
+      // s.off()
     }
 
     lastCO2ppm = co2ppm
@@ -37,7 +37,7 @@ module.exports = (em) => {
     if (bathroomData.humidity > 70) {
       s.on()
     } else {
-      s.off()
+      // s.off()
     }
   })
 }

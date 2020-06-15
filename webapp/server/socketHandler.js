@@ -1,7 +1,9 @@
+const moment = require('moment')
 const { SWITCHES, SENSORS } = require('./config')
 const {
   getSensorsStatus,
-  getSwitchesStatus
+  getSwitchesStatus,
+  initdataFactory
 } = require('./lib')
 
 module.exports = async({ em, io, db }) => {
@@ -14,11 +16,11 @@ module.exports = async({ em, io, db }) => {
       const data = await db.SensorsLog.find({
         name: s.name,
         timestamp: {
-          '$gte': new Date().getHours() - 24
+          '$gte': moment().subtract(25, 'hours')
         }
       }).exec()
 
-      initData['sensors'][s.name] = data
+      initData['sensors'][s.name] = data.map(initdataFactory)
     }
   } catch (error) {
     console.error(error)

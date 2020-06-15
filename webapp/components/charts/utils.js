@@ -17,29 +17,46 @@ export function createChart(options = {}) {
         count: 1,
         type: 'minute',
         text: '1M'
-      }, {
-        count: 5,
-        type: 'minute',
-        text: '5M'
-      }, {
+      },
+      // {
+      //   count: 5,
+      //   type: 'minute',
+      //   text: '5M'
+      // },
+      {
         count: 15,
         type: 'minute',
         text: '15M'
-      }, {
+      },
+      {
         count: 30,
         type: 'minute',
         text: '30M'
       },
       {
-        count: 59,
-        type: 'minute',
+        count: 1,
+        type: 'hour',
         text: '1H'
-      }
-      // {
-      //   type: 'all',
-      //   text: 'All'
-      // }
-      ],
+      },
+      {
+        count: 6,
+        type: 'hour',
+        text: '6H'
+      },
+      {
+        count: 12,
+        type: 'hour',
+        text: '12H'
+      },
+      {
+        count: 24,
+        type: 'hour',
+        text: '24H'
+      },
+      {
+        type: 'all',
+        text: 'All'
+      }],
       inputEnabled: false,
       selected: 0
     },

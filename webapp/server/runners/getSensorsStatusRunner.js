@@ -24,13 +24,10 @@ module.exports = function({ db, io, em }) {
         timestamp: new Date()
       })
       saveDataPromises.push(s)
+      dataToUpdate[d.name] = d
     }
 
     await Promise.all(saveDataPromises)
-
-    sensorsData.forEach(s => {
-      dataToUpdate[s.name] = s
-    })
 
     if (Object.keys(dataToUpdate).length > 0) {
       io.emit('updateSensors', dataToUpdate)

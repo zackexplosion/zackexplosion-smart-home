@@ -14,11 +14,18 @@
 import Charts from '~/components/charts'
 import Sensors from '~/components/sensors'
 import Switches from '~/components/switches'
+import { Loading } from 'element-ui'
 export default {
   components: {
     Switches,
     Sensors,
     Charts
+  },
+  mounted() {
+    const loadingInstance = Loading.service({})
+    this.$socket.on('setInitData', (data) => {
+      loadingInstance.close()
+    })
   }
 }
 </script>
