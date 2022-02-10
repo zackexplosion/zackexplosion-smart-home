@@ -33,7 +33,7 @@
     "moment": "^2.26.0",
     "mongodb": "^3.5.8",
     "mongoose": "^5.9.18",
-    "node-sass": "^4.14.1",
+    "node-sass": "^7.0.0",
     "nodemon": "^2.0.4",
     "nuxt": "^2.0.0",
     "sass-loader": "^8.0.2",
